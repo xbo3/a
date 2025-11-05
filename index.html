@@ -278,13 +278,25 @@ aside{width:var(--sidebar-w);flex-shrink:0}
 <div id="joinModal" class="modal">
   <div class="win">
     <div class="hd"><div class="title">가입창</div><button id="joinClose" class="close">✕</button></div>
-    <div class="mt-3 grid gap-3">
-      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="아이디">
-      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="성함">
-      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="비밀번호" type="password">
-      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="연락처">
-      <button id="joinSubmit" class="px-4 py-3 rounded-md bg-[#0ea5e9] text-white">가입완료</button>
-    </div>
+    
+    <form id="joinForm" class="form mt-3">
+      <label>아이디
+        <div class="input-group">
+          <input class="input" name="user_id" autocomplete="username" placeholder="아이디를 입력하세요" required/>
+          <button type="button" class="btn-duplicate">중복확인</button>
+        </div>
+      </label>
+      <label>성함<input class="input" name="name" autocomplete="name" placeholder="성함을 입력하세요" required/></label>
+      <label>비밀번호<input class="input" type="password" name="pw" autocomplete="new-password" placeholder="비밀번호를 입력하세요" required/></label>
+      <label>비밀번호 확인<input class="input" type="password" name="pw_confirm" autocomplete="new-password" placeholder="비밀번호를 다시 입력하세요" required/></label>
+      <label>연락처
+        <div class="input-group">
+          <input class="input" name="phone" autocomplete="tel" placeholder="연락처를 입력하세요" required/>
+          <button type="button" class="btn-duplicate">중복확인</button>
+        </div>
+      </label>
+      <button id="joinSubmit" class="btn-primary" type="submit">회원가입</button>
+    </form>
   </div>
 </div>
 
