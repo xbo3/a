@@ -235,16 +235,16 @@ header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;borde
   <form id="joinForm" class="form">
     <label>아이디
       <div class="input-group">
-        <input class="input" name="user_id" placeholder="아이디를 입력하세요" required/>
+       <input class="input" name="user_id" autocomplete="username" placeholder="아이디를 입력하세요" required/>
         <button type="button" class="btn-duplicate">중복확인</button>
       </div>
     </label>
-    <label>성함<input class="input" name="name" placeholder="성함을 입력하세요" required/></label>
-    <label>비밀번호<input class="input" type="password" name="pw" placeholder="비밀번호를 입력하세요" required/></label>
-    <label>비밀번호 확인<input class="input" type="password" name="pw_confirm" placeholder="비밀번호를 다시 입력하세요" required/></label>
+    <label>성함<input class="input" name="name" autocomplete="name" placeholder="성함을 입력하세요" required/>
+    <label>비밀번호<input class="input" type="password" name="pw" autocomplete="new-password" placeholder="비밀번호를 입력하세요" required/>
+    <label>비밀번호 확인<input class="input" type="password" name="pw_confirm" autocomplete="new-password" placeholder="비밀번호를 다시 입력하세요" required/>
     <label>연락처
       <div class="input-group">
-        <input class="input" name="phone" placeholder="연락처를 입력하세요" required/>
+        <input class="input" name="phone" autocomplete="tel" placeholder="연락처를 입력하세요" required/>
         <button type="button" class="btn-duplicate">중복확인</button>
       </div>
     </label>
