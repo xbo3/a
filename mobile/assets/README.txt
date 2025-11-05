@@ -1,4 +1,4 @@
-EURO247 Mobile /assets/ 안내
+bipa Mobile /assets/ 안내
 
 이 폴더에는 Hero 영상 파일들을 넣어주세요. 파일명 패턴(예시):
 
