@@ -347,7 +347,7 @@ document.getElementById('joinForm').addEventListener('submit',e=>{e.preventDefau
 /* 자산 로딩 (mobile → mobil 폴백) - 🚨 경로 수정 완료 🚨 */
 (function assets(){
   // a 레포지토리 루트에서 'mobile/assets/' 폴더를 찾도록 경로 수정
-  const bases=['mobile/assets/','mobil/assets/']; 
+  const bases=['mobile/assets/']; 
   function ok(u){return new Promise(r=>{const i=new Image();i.onload=()=>r(true);i.onerror=()=>r(false);i.src=u+'?v=40r7';});}
   (async ()=>{
     let base=bases[0]; for(const b of bases){ if(await ok(b+'herom1.jpg')){ base=b; break; } }
