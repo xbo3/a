@@ -1,456 +1,235 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" id="vp" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>EURO247</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+<title>EURO247 - Mobile</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-(function(){
-  const vp=document.getElementById('vp');
-  function applyDesktopScale(){
-    const w=window.screen.width, target=1280;
-    if(w<=820){
-      const s=w/target;
-      vp.setAttribute('content',`width=${target}, initial-scale=${s}, maximum-scale=${s}, minimum-scale=${s}, user-scalable=no, viewport-fit=cover`);
-      document.documentElement.classList.add('mobile-desktop');
-    }else{
-      vp.setAttribute('content','width=device-width, initial-scale=1, viewport-fit=cover');
-      document.documentElement.classList.remove('mobile-desktop');
-    }
-  }
-  applyDesktopScale();
-  addEventListener('resize',applyDesktopScale);
-})();
-</script>
 <style>
-html,body{overflow-x:hidden}
+/* Reset and Globals */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif;background:#0f1215;color:#eaf2ff}
+
+/* ===== Vars ===== */
 :root{
-  --sidebar-w:240px; --container:1480px;
-  --bg:#0f1215; --p1:#171a1f; --bd:#2a2f36; --text:#fff;
-  --hero-h:260px; --gap:10px; --overlay-dur:1.6s;
-  --promo-row:180px; --promo-mult:1;
+  --gap:clamp(6px,2vw,12px);
+  --side:16px;
+  --H-header:56px; --H-member:64px; --H-bottom:64px;
+  --bd:#2a2f36;
 }
-*{box-sizing:border-box} body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',Inter,system-ui}
-.card{border:1px solid var(--bd);background:var(--p1);border-radius:14px}
 
-/* Header */
-header{position:sticky;top:0;z-index:70;background:#13161B;border-bottom:1px solid var(--bd)}
-.header-inner{max-width:var(--container);margin:0 auto;display:flex;align-items:center;gap:12px;height:72px;padding:0 12px}
-.logo-box{width:var(--sidebar-w)}
-.logo-img{height:70px}
-.search{flex:1;display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border-radius:12px;background:#171a1f;border:1px solid var(--bd)}
+/* ===== Header & member ===== */
+header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;border-bottom:1px solid #232a34;padding:12px var(--side)}
+#logoSlot{display:flex;align-items:center;gap:10px;font-size:clamp(18px,5vw,24px);font-weight:900}
+#memberSlot{position:fixed;left:0;right:0;top:var(--H-header);height:var(--H-member);padding:0 var(--side);background:#13161b;border-bottom:1px solid var(--bd);z-index:900;display:flex;gap:var(--gap);align-items:center}
+.btn-member{flex:1;height:40px;border:1px solid var(--bd);border-radius:8px;font-size:15px;font-weight:700}
+#btnJoin{background:linear-gradient(180deg,#1a2b45,#132237);color:#fff}
+#btnLogin{background:linear-gradient(180deg,#2b1733,#231327);color:#fff}
 
-/* Layout */
-.layout{max-width:var(--container);margin:0 auto;display:flex;gap:16px;padding:0 12px}
-aside{width:var(--sidebar-w);flex-shrink:0}
-.sidebox{border:1px solid var(--bd);border-radius:12px;background:#12171c;overflow:hidden;margin-bottom:12px}
-.sidebox .head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-weight:900;background:linear-gradient(180deg,#151b21,#11161b);cursor:pointer}
-.sidebox .caret{color:#7f8e9c;transition:transform .45s}
-.sidebox.open .caret{transform:rotate(180deg)}
-.sidebox .body{height:0;overflow:hidden}
-.menu-list{padding:10px}
-.menu-pill{display:flex;align-items:center;height:40px;border:1px solid #2a2f36;border-radius:10px;padding:0 12px;margin-bottom:8px;background:linear-gradient(90deg,#141a20 0%,#141a20 60%,#1b2630 100%);opacity:0;transform:translateY(-6px);transition:opacity .35s,transform .35s,border-color .25s,box-shadow .25s}
-.menu-pill.show{opacity:1;transform:translateY(0)}
-.menu-pill:hover{border-color:#67e8f9aa;box-shadow:0 0 0 1px #67e8f955 inset,0 10px 20px rgba(0,0,0,.25)}
+/* ===== Main Layout ===== */
+main{padding-top:calc(var(--H-header) + var(--H-member));padding-bottom:var(--H-bottom);min-height:100%}
+.content{padding:0 var(--side);max-width:600px;margin:0 auto}
+.section{margin-bottom:24px}
+.grid-head{font-size:18px;font-weight:900;margin-bottom:12px}
 
-/* Member buttons */
-.btn-row{display:flex;gap:8px;margin-bottom:8px}
-.btn-half{flex:1;height:40px;border-radius:10px;border:1px solid #2a2f36;background:linear-gradient(180deg,#1a2b45,#132237);font-weight:800}
-.btn-half.login{background:linear-gradient(180deg,#2b1733,#231327)}
-.btn-vip{width:100%;height:40px;border-radius:10px;border:1px solid #2a2f36;background:linear-gradient(180deg,#2d3a1c,#1e2812);font-weight:900}
+/* ===== Hero (Mobile) ===== */
+#heroSlot{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);margin-bottom:var(--gap)}
+.hero-card{aspect-ratio:1/1;position:relative;overflow:hidden;border-radius:12px}
+.hero-card img{width:100%;height:100%;object-fit:cover}
+.name-line{display:flex;align-items:center;gap:6px;font-size:14px}
+.tg-ico{display:inline-flex;width:16px;height:16px;opacity:.9}
+.tg-ico svg{width:16px;height:16px}
 
-/* Sections */
-.section{margin-top:18px}
+/* ===== 6 Cards (Mobile) ===== */
+.six-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap)}
+.six-grid .card{border:1px solid var(--bd);border-radius:12px;overflow:hidden;background:#171a1f}
+.card-body{padding:12px}
+.card-title{font-weight:700;font-size:16px}
+.card-sub{font-size:12px;color:#9ca3af;margin-top:4px}
 
-/* Hero */
-#heroWrap{overflow:hidden}
-.hero-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
-.hero-card{height:var(--hero-h);position:relative;overflow:hidden;background:linear-gradient(180deg,#1b2128,#14191e)}
-.name-line{display:flex;align-items:center;gap:8px}
-.tg-ico{display:inline-flex;width:18px;height:18px;opacity:.9}
-.tg-ico svg{width:18px;height:18px}
+/* ===== Promo Grid (Mobile) ===== */
+.promo-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);grid-auto-rows:80px}
+.promo-grid .card{position:relative;border-radius:10px;overflow:hidden;background:linear-gradient(180deg,#151b21,#11161b);box-shadow:0 0 0 1px rgba(120,160,200,.18) inset}
+.excl-big{grid-column:span 2;grid-row:span 2}
+.promo-holder{position:absolute;inset:0}
+.promo-holder img{width:100%;height:100%;object-fit:cover;filter:brightness(.9)}
+.promo-title{position:absolute;font-weight:700;font-size:14px;padding:10px;text-shadow:0 2px 5px rgba(0,0,0,.6)}
+.promo-title.tl{top:0;left:0}.promo-title.tr{top:0;right:0;text-align:right}
+.promo-title.bl{bottom:0;left:0}.promo-title.br{bottom:0;right:0;text-align:right}
 
-/* 6-cards */
-.six-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--gap)}
-.six-grid .card{border-radius:16px;overflow:hidden}
+/* ===== Bottom Nav (Mobile) ===== */
+#bottomNav{position:fixed;left:0;right:0;bottom:0;z-index:1000;height:var(--H-bottom);background:#13161b;border-top:1px solid var(--bd);display:flex;justify-content:space-around;align-items:center}
+.nav-btn{display:flex;flex-direction:column;align-items:center;font-size:12px;color:#94a3b8}
 
-/* Promo 1+4 */
-.exclusive{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gap);grid-auto-rows:calc(var(--promo-row)*var(--promo-mult))}
-.excl-big{grid-column:span 6;grid-row:span 2}
-.excl-small{grid-column:span 3}
-.exclusive .card{position:relative;border-radius:14px;background:linear-gradient(180deg,#151b21,#11161b);box-shadow:0 0 0 1px rgba(120,160,200,.18) inset}
-.promo-card{padding:0;cursor:pointer;touch-action:manipulation}
-.promo-holder{position:absolute;inset:0;overflow:hidden;border-radius:14px}
-.promo-holder img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.95)}
-.promo-title{position:absolute;font-weight:800;font-size:16px;padding:10px 12px;text-shadow:0 2px 10px rgba(0,0,0,.6)}
-.promo-title.tl{top:8px;left:12px}.promo-title.tr{top:8px;right:12px;text-align:right}
-.promo-title.bl{bottom:8px;left:12px}.promo-title.br{bottom:8px;right:12px;text-align:right}
-
-/* Overlay (fixed page view) */
-.overlay{position:fixed;inset:0;z-index:9999;pointer-events:none}
-.overlay[hidden]{display:none}
-.overlay .scrim{position:absolute;inset:0;background:rgba(0,0,0,.45);opacity:0}
-.overlay .panel{position:absolute;width:0;height:0;background:#161a24;border:1px solid #2a2f36;border-radius:14px;transform-origin:0 0;box-shadow:0 18px 60px rgba(0,0,0,.35);overflow:hidden}
-.overlay.show{pointer-events:auto}
-.overlay .content{padding:16px}
-.overlay .close{position:absolute;right:12px;top:10px;padding:.35rem .6rem;border-radius:.5rem;background:#0ea5e9;color:#fff;font-weight:700}
-
-/* Modals */
-.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);z-index:10000}
-.modal .win{width:min(560px,92vw);background:#12161c;border:1px solid #2a2f36;border-radius:14px;padding:18px}
+/* ===== Modals (Join/Login/Done) ===== */
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.65);z-index:10000;padding:var(--side)}
+.modal .win{width:100%;max-width:400px;background:#12161c;border:1px solid var(--bd);border-radius:14px;padding:20px}
 .modal .hd{display:flex;align-items:center;justify-content:space-between}
-.modal .title{font-weight:800}
-.modal .close{color:#cbd5e1}
+.modal .title{font-size:18px;font-weight:800}
+.modal .close{color:#cbd5e1;cursor:pointer;font-size:24px}
+.modal label{display:block;color:#94a3b8;font-size:14px}
+.modal label input, .modal select{margin-top:4px;outline:none;width:100%;padding:10px 12px;border-radius:6px;background:#0f1318;border:1px solid #2a2f36}
+
+/* Input group style for duplicate check (Mobile) */
+.input-group{display:flex;align-items:center;gap:8px;margin-top:4px}
+.input-group input{flex:1 !important;margin-top:0 !important;width:auto !important}
+.input-group .btn-duplicate{flex-shrink:0;padding:.5rem .75rem;border-radius:.375rem;background:#2a2f36;color:white;font-size:12px;white-space:nowrap}
+
+/* Survey-specific styles (Mobile) */
+.survey-title{font-weight:700;font-size:16px;line-height:1.4;white-space:pre-wrap;color:#eaf2ff}
+.survey-field{display:grid;gap:10px;margin-top:14px}
+.survey-field .radio{display:flex;align-items:center;padding:10px 12px;border:1px solid #2a2f36;border-radius:8px;cursor:pointer;background:#171a1f;color:#cbd5e1}
+.survey-field .radio:has(input:checked){border-color:#0ea5e9;background:#11151a}
+.survey-field .radio input{margin-right:10px;transform:scale(1.2);cursor:pointer;flex-shrink:0}
+.survey-field .input{padding:10px 12px;border:1px solid #2a2f36;border-radius:8px;background:#0f1318}
+.survey-actions{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
 </style>
-
-<script>
-(function(){
-  const url = new URL(location.href);
-  const f = url.searchParams.get('force');
-  if (f === 'desktop') localStorage.setItem('forceDesktop','1');
-  if (f === 'mobile')  localStorage.removeItem('forceDesktop');
-
-  const forced = localStorage.getItem('forceDesktop') === '1';
-  const inMobile = /\/mobile(\/|$)/i.test(location.pathname);
-  const mobileUA = /(Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini)/i.test(navigator.userAgent);
-  const small = Math.min(window.innerWidth, window.innerHeight) <= 768;
-
-  if (!inMobile && !forced && (f === 'mobile' || mobileUA || small)) {
-    location.replace('mobile/');
-  }
-})();
-</script>
-
 </head>
 <body>
+
 <header>
-  <div class="header-inner">
-    <div class="logo-box"><img class="logo-img" src="assets/bipa.png" alt="bipa"></div>
-   
-  </div>
+  <div id="logoSlot"><img style="height:28px" src="assets/logo_euro247.png" alt="EURO247"></div>
 </header>
+<div id="memberSlot">
+  <button class="btn-member" id="btnJoin">가입</button>
+  <button class="btn-member" id="btnLogin">로그인</button>
+  <button id="btnVip" class="btn-member" style="flex:0;width:80px;background:linear-gradient(180deg,#2d3a1c,#1e2812);color:#fff">VIP</button>
+</div>
 
-<div class="layout">
-  <aside>
-    <div class="sidebox open" id="memberBox">
-      <div class="head"><span>회원</span><span class="caret">⌄</span></div>
-      <div class="body"><div class="menu-list">
-        <div class="btn-row">
-          <button class="btn-half"  id="btnJoin">가입</button>
-          <button class="btn-half login" id="btnLogin">로그인</button>
+<main>
+  <div class="content">
+
+    <div class="section" id="heroSec">
+      <div id="heroSlot">
+        <div class="hero-card" style="background:linear-gradient(180deg,#1b2128,#14191e)">
+          <img src="assets/hero_left.jpg" alt="Jayme Sun" onerror="this.style.display='none'">
+          <div class="absolute left-3 bottom-3 text-white">
+            <div class="text-xs text-neutral-300">Jayme Sun</div>
+            <div class="name-line font-bold">Executive Host
+              <span class="tg-ico" title="Telegram">
+                <svg viewBox="0 0 24 24" fill="#29A9EA"><path d="M9.2 16.9 8.9 20c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.4.2 1.6-.8l2.9-13.7c.3-1.2-.4-1.7-1.2-1.4L2.7 9.7c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3L18.7 6c.6-.4 1.1-.2.7.2L9.2 16.9z"/></svg>
+              </span>
+            </div>
+          </div>
         </div>
-        <button class="btn-vip" id="btnVip">VIP 호출</button>
-      </div></div>
-    </div>
-
-    <!-- 1. 프로모션 -->
-    <div class="sidebox open" id="boxPromo">
-      <div class="head"><span>프로모션</span><span class="caret">⌄</span></div>
-      <div class="body"><div class="menu-list">
-        <div class="menu-pill" data-cat="공식,비공식프로모션">공식,비공식프로모션</div>
-        <div class="menu-pill" data-cat="신규즉시프로모션">신규즉시프로모션</div>
-        <div class="menu-pill" data-cat="시험범위공부하기">시험범위공부하기</div>
-        <div class="menu-pill" data-cat="퀴즈풀고쿠폰받기">퀴즈풀고쿠폰받기</div>
-      </div></div>
-    </div>
-
-    <!-- 2. 파트너서비스 -->
-    <div class="sidebox open" id="boxCat">
-      <div class="head"><span>파트너서비스</span><span class="caret">⌄</span></div>
-      <div class="body"><div class="menu-list">
-        <div class="menu-pill" data-cat="파트너서비스">🎫 파트너서비스</div>
-        <div class="menu-pill" data-cat="등급별 혜택">🧾 등급별 혜택</div>
-        <div class="menu-pill" data-cat="문의하기">🧩 문의하기</div>
-        <div class="menu-pill" data-cat="파트너인턴십 지원">🧩 파트너인턴십 지원</div>
-        <div class="menu-pill" data-cat="쿠폰신청하기">🧩 쿠폰신청하기</div>
-        <div class="menu-pill" data-cat="긴급쿠폰싱청" id="prefLine">⭐ 긴급쿠폰신청</div>
-      </div></div>
-    </div>
-
-    <!-- 3. 쿠폰 -->
-    <div class="sidebox open" id="boxCF">
-      <div class="head"><span>💸쿠폰💸</span><span class="caret">⌄</span></div>
-      <div class="body"><div class="menu-list">
-        <div class="menu-pill">쿠폰의 종류</div>
-        <div class="menu-pill">쿠폰신청하기</div>
-        <div class="menu-pill">긴급쿠폰신청하기</div>
-        <div class="menu-pill">인턴파트너영업쿠폰신청</div>
-      </div></div>
-    </div>
-  </aside>
-
-  <main class="flex-1 pb-16">
-    <div id="mainShift">
-      <!-- Hero (default collapsed) -->
-      <div id="heroWrap" style="height:0;overflow:hidden">
-        <div class="card p-3">
-          <div class="hero-grid">
-            <!-- Hero 1 -->
-            <div class="card hero-card">
-              <img src="assets/hero_left.jpg" alt="Jayme Sun" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px" onerror="this.style.display='none'">
-              <div class="absolute left-4 bottom-3">
-                <div class="text-xs text-neutral-300">Jayme Sun (제이미 선)</div>
-                <div class="name-line font-bold">Executive Host
-                  <span class="tg-ico" title="Telegram">
-                    <svg viewBox="0 0 24 24" fill="#29A9EA"><path d="M9.2 16.9 8.9 20c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.4.2 1.6-.8l2.9-13.7c.3-1.2-.4-1.7-1.2-1.4L2.7 9.7c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3L18.7 6c.6-.4 1.1-.2.7.2L9.2 16.9z"/></svg>
-                  </span>
-                </div>
-              </div>
-            </div>
-            <!-- Hero 2 (Tom Woo) -->
-            <div class="card hero-card">
-              <img src="assets/hero_center.jpg" alt="Tom Woo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px" onerror="this.style.display='none'">
-              <div class="absolute left-4 bottom-3">
-                <div class="text-xs text-neutral-300">Tom Woo (탐 우)</div>
-                <div class="name-line font-bold">Mid-level Host
-                  <a class="tg-ico" href="https://t.me/woo247" target="_blank" rel="noopener" title="Telegram">
-                    <svg viewBox="0 0 24 24" fill="#29A9EA"><path d="M9.2 16.9 8.9 20c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.4.2 1.6-.8l2.9-13.7c.3-1.2-.4-1.7-1.2-1.4L2.7 9.7c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3L18.7 6c.6-.4 1.1-.2.7.2L9.2 16.9z"/></svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <!-- Hero 3 (Jay Hong) -->
-            <div class="card hero-card">
-              <img src="assets/hero_right.jpg" alt="Jay Hong" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px" onerror="this.style.display='none'">
-              <div class="absolute left-4 bottom-3">
-                <div class="text-xs text-neutral-300">Jay Hong (재 홍)</div>
-                <div class="name-line font-bold">Executive Host
-                  <a class="tg-ico" href="https://t.me/exid333" target="_blank" rel="noopener" title="Telegram">
-                    <svg viewBox="0 0 24 24" fill="#29A9EA"><path d="M9.2 16.9 8.9 20c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.4.2 1.6-.8l2.9-13.7c.3-1.2-.4-1.7-1.2-1.4L2.7 9.7c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3L18.7 6c.6-.4 1.1-.2.7.2L9.2 16.9z"/></svg>
-                  </a>
-                </div>
-              </div>
+        <div class="hero-card" style="background:linear-gradient(180deg,#1b2128,#14191e)">
+          <img src="assets/hero_mid.jpg" alt="Tom Woo" onerror="this.style.display='none'">
+          <div class="absolute left-3 bottom-3 text-white">
+            <div class="text-xs text-neutral-300">Tom Woo</div>
+            <div class="name-line font-bold">Executive Host
+              <a class="tg-ico" href="https://t.me/exid333" target="_blank" rel="noopener" title="Telegram">
+                <svg viewBox="0 0 24 24" fill="#29A9EA"><path d="M9.2 16.9 8.9 20c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.4.2 1.6-.8l2.9-13.7c.3-1.2-.4-1.7-1.2-1.4L2.7 9.7c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3L18.7 6c.6-.4 1.1-.2.7.2L9.2 16.9z"/></svg>
+              </a>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Promo group -->
-      <div id="promoGroup" class="section">
-        <div class="exclusive">
-          <!-- Big socket → 가입 팝업 -->
-          <button id="promo-big" class="card excl-big" data-img="PRO_BIG" style="position:relative;cursor:pointer">
-            <div class="promo-holder"></div>
-            <div class="p-5 text-left"><div class="text-lg font-bold">퀴즈만점!쿠폰만점!</div></div>
-          </button>
-          <!-- 4 sockets (transform pages) -->
-          <button class="card excl-small promo-card" data-go="#page-official" data-img="PRO1"><div class="promo-holder"></div><div class="promo-title tl">공식프로모션</div></button>
-          <button class="card excl-small promo-card" data-go="#page-partner"  data-img="PRO2"><div class="promo-holder"></div><div class="promo-title tr">파트너프로모션</div></button>
-          <button class="card excl-small promo-card" data-go="#page-now"      data-img="PRO3"><div class="promo-holder"></div><div class="promo-title bl">지금진행중</div></button>
-          <button class="card excl-small promo-card" data-go="#page-join"     data-img="PRO4"><div class="promo-holder"></div><div class="promo-title br">프로모션참여</div></button>
-        </div>
-      </div>
-
-      <!-- 6 cards -->
-      <div class="section" id="cards6">
-        <div class="six-grid">
-          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(0,70%,60%),hsl(60,50%,45%))"></div><div class="p-3"><div class="font-bold">30,000 슬롯전용쿠폰</div><div class="text-xs text-neutral-400 mt-1">사용 완료</div></div></div>
-          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(17,70%,60%),hsl(77,50%,45%))"></div><div class="p-3"><div class="font-bold">20,000 즉석쿠폰</div><div class="text-xs text-neutral-400 mt-1">3등급사용가능</div></div></div>
-          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(34,70%,60%),hsl(94,50%,45%))"></div><div class="p-3"><div class="font-bold">30,000 즉석쿠폰</div><div class="text-xs text-neutral-400 mt-1">사용 완료</div></div></div>
-          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(51,70%,60%),hsl(111,50%,45%))"></div><div class="p-3"><div class="font-bold">60,000 롤링쿠폰</div><div class="text-xs text-neutral-400 mt-1">3등급사용가능</div></div></div>
-          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(68,70%,60%),hsl(128,50%,45%))"></div><div class="p-3"><div class="font-bold">70,000 VIP쿠폰</div><div class="text-xs text-neutral-400 mt-1">사용 완료</div></div></div>
-          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(85,70%,60%),hsl(145,50%,45%))"></div><div class="p-3"><div class="font-bold">100,000 VIP쿠폰</div><div class="text-xs text-neutral-400 mt-1">사용 완료</div></div></div>
-        </div>
+    </div>
+    
+    <div class="section">
+      <div class="promo-grid">
+        <button id="promo-big" class="card excl-big" data-img="PRO_BIG" style="position:relative;cursor:pointer">
+          <div class="promo-holder"></div>
+          <div class="absolute p-4 text-left text-white"><div class="text-xl font-bold">퀴즈만점!쿠폰만점!</div></div>
+        </button>
+        <button class="card promo-card" data-go="#page-official" data-img="PRO1"><div class="promo-holder"></div><div class="promo-title tl">공식프로모션</div></button>
+        <button class="card promo-card" data-go="#page-partner"  data-img="PRO2"><div class="promo-holder"></div><div class="promo-title tr">파트너프로모션</div></button>
+        <button class="card promo-card" data-go="#page-now"      data-img="PRO3"><div class="promo-holder"></div><div class="promo-title bl">지금진행중</div></button>
+        <button class="card promo-card" data-go="#page-join"     data-img="PRO4"><div class="promo-holder"></div><div class="promo-title br">프로모션참여</div></button>
       </div>
     </div>
-  </main>
-</div>
 
-<!-- Page templates -->
-<template id="pages">
-  <section id="page-official" class="content"><h2>공식프로모션</h2><p class="text-sm text-neutral-300">콘텐츠 준비중</p></section>
-  <section id="page-partner"  class="content"><h2>파트너프로모션</h2><p class="text-sm text-neutral-300">콘텐츠 준비중</p></section>
-  <section id="page-now"      class="content"><h2>지금진행중</h2><p class="text-sm text-neutral-300">콘텐츠 준비중</p></section>
-  <section id="page-join"     class="content"><h2>프로모션참여</h2><p class="text-sm text-neutral-300">콘텐츠 준비중</p></section>
-</template>
+    <div class="section">
+      <div class="grid-head">신규쿠폰</div>
+      <div class="six-grid">
+        <div class="card"><div style="aspect-ratio:1/1;background:linear-gradient(180deg,hsl(0,70%,60%),hsl(60,50%,45%))"></div><div class="card-body"><div class="card-title">30,000 슬롯전용쿠폰</div><div class="card-sub">사용 완료</div></div></div>
+        <div class="card"><div style="aspect-ratio:1/1;background:linear-gradient(180deg,hsl(17,70%,60%),hsl(77,50%,45%))"></div><div class="card-body"><div class="card-title">20,000 즉석쿠폰</div><div class="card-sub">3등급사용가능</div></div></div>
+        <div class="card"><div style="aspect-ratio:1/1;background:linear-gradient(180deg,hsl(34,70%,60%),hsl(94,50%,45%))"></div><div class="card-body"><div class="card-title">30,000 즉석쿠폰</div><div class="card-sub">사용 완료</div></div></div>
+        <div class="card"><div style="aspect-ratio:1/1;background:linear-gradient(180deg,hsl(51,70%,60%),hsl(111,50%,45%))"></div><div class="card-body"><div class="card-title">60,000 롤링쿠폰</div><div class="card-sub">3등급사용가능</div></div></div>
+        <div class="card"><div style="aspect-ratio:1/1;background:linear-gradient(180deg,hsl(68,70%,60%),hsl(128,50%,45%))"></div><div class="card-body"><div class="card-title">70,000 VIP쿠폰</div><div class="card-sub">사용 완료</div></div></div>
+        <div class="card"><div style="aspect-ratio:1/1;background:linear-gradient(180deg,hsl(85,70%,60%),hsl(145,50%,45%))"></div><div class="card-body"><div class="card-title">100,000 VIP쿠폰</div><div class="card-sub">사용 완료</div></div></div>
+      </div>
+    </div>
 
-<!-- Overlay -->
-<div id="overlay" class="overlay" hidden>
-  <div class="scrim"></div>
-  <div class="panel">
-    <button id="btnClose" class="close">닫기</button>
-    <div id="overlayBody" class="content"></div>
   </div>
+</main>
+
+<div id="bottomNav">
+  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2a10 10 0 0 0-9 5.5l9 6 9-6A10 10 0 0 0 12 2zm0 18a10 10 0 0 0 9-5.5l-9-6-9 6a10 10 0 0 0 9 5.5z"/></svg>홈</button>
+  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2a10 10 0 0 0-9 5.5l9 6 9-6A10 10 0 0 0 12 2zm0 18a10 10 0 0 0 9-5.5l-9-6-9 6a10 10 0 0 0 9 5.5z"/></svg>이벤트</button>
+  <button class="nav-btn" style="color:#0ea5e9"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2a10 10 0 0 0-9 5.5l9 6 9-6A10 10 0 0 0 12 2zm0 18a10 10 0 0 0 9-5.5l-9-6-9 6a10 10 0 0 0 9 5.5z"/></svg>파트너</button>
+  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2a10 10 0 0 0-9 5.5l9 6 9-6A10 10 0 0 0 12 2zm0 18a10 10 0 0 0 9-5.5l-9-6-9 6a10 10 0 0 0 9 5.5z"/></svg>고객센터</button>
+  <button class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2a10 10 0 0 0-9 5.5l9 6 9-6A10 10 0 0 0 12 2zm0 18a10 10 0 0 0 9-5.5l-9-6-9 6a10 10 0 0 0 9 5.5z"/></svg>마이페이지</button>
 </div>
 
-<!-- Join -->
+
 <div id="joinModal" class="modal">
   <div class="win">
     <div class="hd"><div class="title">가입창</div><button id="joinClose" class="close">✕</button></div>
-    <div class="mt-3 grid gap-3">
-      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="아이디">
-      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="성함">
-      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="비밀번호" type="password">
-      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="연락처">
-      <button id="joinSubmit" class="px-4 py-3 rounded-md bg-[#0ea5e9] text-white">가입완료</button>
-    </div>
+    <form id="joinForm" class="mt-4 grid gap-4">
+      <label>아이디
+        <div class="input-group">
+          <input name="user_id" autocomplete="username" placeholder="아이디를 입력하세요" required/>
+          <button type="button" class="btn-duplicate">중복확인</button>
+        </div>
+      </label>
+      <label>성함<input name="name" autocomplete="name" placeholder="성함을 입력하세요" required/></label>
+      <label>비밀번호<input type="password" name="pw" autocomplete="new-password" placeholder="비밀번호를 입력하세요" required/></label>
+      <label>비밀번호 확인<input type="password" name="pw_confirm" autocomplete="new-password" placeholder="비밀번호를 다시 입력하세요" required/></label>
+      <label>연락처
+        <div class="input-group">
+          <input name="phone" autocomplete="tel" placeholder="연락처를 입력하세요" required/>
+          <button type="button" class="btn-duplicate">중복확인</button>
+        </div>
+      </label>
+      <button id="joinSubmit" class="px-4 py-3 rounded-md bg-[#0ea5e9] text-white" type="submit">회원가입</button>
+    </form>
   </div>
 </div>
 
-<!-- Login -->
 <div id="loginModal" class="modal">
   <div class="win">
     <div class="hd"><div class="title">로그인</div><button id="loginClose" class="close">✕</button></div>
-    <div class="mt-3 grid gap-3">
-      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="아이디">
-      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="비밀번호" type="password">
+    <div class="mt-4 grid gap-4">
+      <label>아이디<input placeholder="아이디"></label>
+      <label>비밀번호<input placeholder="비밀번호" type="password"></label>
       <button class="px-4 py-3 rounded-md bg-[#0ea5e9] text-white">로그인</button>
     </div>
   </div>
 </div>
 
-<!-- Join Done -->
 <div id="joinDone" class="modal">
   <div class="win">
     <div class="hd"><div class="title">가입 완료</div><button id="doneClose" class="close">✕</button></div>
-    <div class="mt-4 text-neutral-200 space-y-4">
-      <a href="https://www.HCASINO2.COM" class="text-2xl font-bold block text-center" target="_blank" rel="noopener">www.ev-62.com 에서</a>
-      <div class="text-center">가입완료하신분만! 1분선호도체크하고</div>
+    <div class="mt-4 text-neutral-200 space-y-5">
+      <a href="https://www.HCASINO2.COM" class="text-xl font-bold block text-center" target="_blank" rel="noopener">www.ev-62.com 에서</a>
+      <div class="text-center text-lg">가입완료하신분만!
+1분선호도체크하고</div>
       <div class="flex justify-center">
-        <button id="btnPref" class="px-8 py-4 rounded-md border border-yellow-400 text-yellow-200 text-xl">선호도 쿠폰받기</button>
+        <button id="btnPref" class="px-6 py-3 rounded-md border border-yellow-400 text-yellow-200 text-lg font-bold">선호도 쿠폰받기</button>
       </div>
       <div class="text-xs text-neutral-400 text-center">*가입하신 후 선호도 쿠폰받기 순서로 하셔야 지급됩니다..</div>
     </div>
   </div>
 </div>
 
-<!-- Preference -->
 <div id="prefModal" class="modal">
   <div class="win">
     <div class="hd"><div class="title">1분 선호도 체크</div><button id="prefClose" class="close">✕</button></div>
-    <div class="mt-4 grid gap-4">
-      <label>선호 게임 장르
-        <select class="w-full mt-1 px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]">
-          <option>슬롯</option><option>라이브 카지노</option><option>스포츠</option><option>기타</option>
-        </select>
-      </label>
-      <label>플레이 빈도
-        <select class="w-full mt-1 px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]">
-          <option>거의 매일</option><option>주 2~3회</option><option>가끔</option>
-        </select>
-      </label>
-      <button id="prefSubmit" class="px-4 py-3 rounded-md bg-[#0ea5e9] text-white">제출하고 쿠폰받기</button>
+    <div id="surveyWrap" class="mt-4">
+        <div id="qTitle" class="survey-title"></div>
+        <div id="qField" class="survey-field"></div>
+        <div class="survey-actions">
+            <button id="svBack" class="px-4 py-3 rounded-md bg-[#2a2f36] text-white flex-1" style="visibility:hidden">이전</button>
+            <button id="svNext" class="px-4 py-3 rounded-md bg-[#0ea5e9] text-white flex-1 font-bold">다음</button>
+        </div>
     </div>
   </div>
 </div>
 
 <script>
-/* side accordion */
-document.querySelectorAll('.sidebox').forEach(box=>{
-  const head=box.querySelector('.head'), body=box.querySelector('.body');
-  const items=[...box.querySelectorAll('.menu-pill,.btn-half,.btn-vip')];
-  const autoH=()=>{ body.style.height='auto'; body.style.height=body.scrollHeight+'px'; };
-  if(box.classList.contains('open')){ autoH(); items.forEach((p,i)=>setTimeout(()=>p.classList.add('show'),i*80)); }
-  head.addEventListener('click',()=>{
-    const open=box.classList.contains('open');
-    if(open){
-      body.style.height=body.scrollHeight+'px';
-      requestAnimationFrame(()=>{ body.style.transition='height .7s cubic-bezier(.2,.8,.2,1)'; body.style.height='0px'; });
-      items.slice().reverse().forEach((p,i)=>setTimeout(()=>p.classList.remove('show'),i*50));
-      body.addEventListener('transitionend',function f(){ body.style.transition=''; box.classList.remove('open'); body.removeEventListener('transitionend',f); },{once:true});
-    }else{
-      box.classList.add('open'); body.style.height='0px';
-      requestAnimationFrame(()=>{ const h=body.scrollHeight+'px'; body.style.transition='height .7s cubic-bezier(.2,.8,.2,1)'; body.style.height=h; });
-      items.forEach((p,i)=>setTimeout(()=>p.classList.add('show'),i*110));
-      body.addEventListener('transitionend',function f(){ body.style.transition=''; body.style.height='auto'; body.removeEventListener('transitionend',f); },{once:true});
-    }
-  });
-});
-
-/* hero height 40% of reference */
-const heroWrap=document.getElementById('heroWrap');
-function alignHero(){
-  const t=document.getElementById('prefLine'); if(!t) return;
-  const bottom=t.getBoundingClientRect().bottom+scrollY;
-  const top=heroWrap.getBoundingClientRect().top+scrollY;
-  const box=heroWrap.querySelector('.card.p-3'); const cs=getComputedStyle(box);
-  const pad=parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom);
-  const base=Math.max(160, Math.round(bottom-top-pad));
-  document.documentElement.style.setProperty('--hero-h', Math.round(base*0.4)+'px');
-}
-addEventListener('load',alignHero); addEventListener('resize',alignHero);
-
-/* hero toggle with VIP (default collapsed) */
-(function(){
-  const btn=document.getElementById('btnVip'); if(!btn) return;
-  let open=false;
-  function collapse(){ const h=heroWrap.scrollHeight; heroWrap.style.height=h+'px'; heroWrap.offsetHeight; heroWrap.style.transition='height .7s cubic-bezier(.2,.8,.2,1)'; heroWrap.style.height='0px'; heroWrap.addEventListener('transitionend',()=>{heroWrap.style.transition='';},{once:true}); }
-  function expand(){ heroWrap.style.height='0px'; heroWrap.offsetHeight; heroWrap.style.transition='height .7s cubic-bezier(.2,.8,.2,1)'; heroWrap.style.height=heroWrap.scrollHeight+'px'; heroWrap.addEventListener('transitionend',()=>{heroWrap.style.transition=''; heroWrap.style.height='auto';},{once:true}); }
-  btn.addEventListener('click',()=>{ open?collapse():expand(); open=!open; });
-})();
-
-/* fixed page rect = from main top to bottom of viewport (red box) */
-let FIXED_RECT=null;
-function computeFixedRect(){
-  const main=document.querySelector('main.flex-1').getBoundingClientRect();
-  const top=document.querySelector('#mainShift').getBoundingClientRect().top;
-  const height=Math.max(200, window.innerHeight - top - 16);  // fill to bottom
-  FIXED_RECT={left:main.left, top, width:main.width, height};
-}
-addEventListener('load',computeFixedRect); addEventListener('resize',computeFixedRect);
-function unifiedRect(){ if(!FIXED_RECT) computeFixedRect(); return FIXED_RECT; }
-
-/* overlay transform (precise) */
-const overlay=document.getElementById('overlay');
-const scrim=overlay.querySelector('.scrim');
-const panel=overlay.querySelector('.panel');
-const bodyEl=document.getElementById('overlayBody');
-const btnClose=document.getElementById('btnClose');
-const pages=document.getElementById('pages');
-const pageMap={}; pages.content.querySelectorAll('section').forEach(s=>pageMap['#'+s.id]=s);
-const DUR=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--overlay-dur'))||1.6;
-const opts={duration:DUR*1000,easing:'cubic-bezier(.2,0,.1,1)',fill:'forwards',composite:'replace'};
-function frameFromRect(from,to){
-  const sx=+(from.width/to.width).toFixed(4), sy=+(from.height/to.height).toFixed(4);
-  const tx=+(from.left-to.left).toFixed(2), ty=+(from.top-to.top).toFixed(2);
-  return `translate3d(${tx}px,${ty}px,0) scale(${sx},${sy})`;
-}
-let busy=false, openView=false, lastRect=null;
-function openFrom(el, sec){
-  if(busy||openView) return; busy=true;
-  bodyEl.innerHTML=''; bodyEl.appendChild(pageMap[sec].cloneNode(true));
-  const toR=unifiedRect(); const fromRect=el.getBoundingClientRect(); lastRect=fromRect;
-  panel.style.left=toR.left+'px'; panel.style.top=toR.top+'px'; panel.style.width=toR.width+'px'; panel.style.height=toR.height+'px';
-  const from=frameFromRect(fromRect,toR);
-  overlay.hidden=false; overlay.classList.add('show');
-  const pa=panel.animate([{opacity:0,transform:from},{opacity:1,transform:'translate3d(0,0,0) scale(1,1)'}],opts);
-  const sa=scrim.animate([{opacity:0},{opacity:1}],opts);
-  Promise.all([pa.finished,sa.finished]).then(()=>{busy=false;openView=true;});
-}
-function closeOverlay(){
-  if(busy||!openView) return; busy=true;
-  const toR=unifiedRect(); const to=frameFromRect(lastRect,toR);
-  const pa=panel.animate([{opacity:1,transform:'translate3d(0,0,0) scale(1,1)'},{opacity:0,transform:to}],opts);
-  const sa=scrim.animate([{opacity:1},{opacity:0}],opts);
-  Promise.all([pa.finished,sa.finished]).then(()=>{overlay.hidden=true;overlay.classList.remove('show');busy=false;openView=false;});
-}
-btnClose.addEventListener('click',closeOverlay); scrim.addEventListener('click',closeOverlay);
-
-/* promo sockets -> open transform */
-document.querySelectorAll('#promoGroup .promo-card').forEach(card=>{
-  card.addEventListener('pointerdown',e=>{
-    e.preventDefault();
-    openFrom(card, card.getAttribute('data-go'));
-  },{passive:false});
-});
-
-/* slide+fade for left submenus using same view box */
-function slideIn(title){
-  const fake=document.createElement('section'); fake.className='content';
-  fake.innerHTML=`<h2>${title}</h2><p class="text-sm text-neutral-300">콘텐츠 준비중</p>`;
-  bodyEl.innerHTML=''; bodyEl.appendChild(fake);
-  const toR=unifiedRect();
-  panel.style.left=toR.left+'px'; panel.style.top=toR.top+'px'; panel.style.width=toR.width+'px'; panel.style.height=toR.height+'px';
-  overlay.hidden=false; overlay.classList.add('show'); openView=true;
-  panel.animate([{opacity:0,transform:'translate3d(-30px,0,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],{duration:480,easing:'cubic-bezier(.2,.8,.2,1)',fill:'forwards'});
-  scrim.animate([{opacity:0},{opacity:1}],{duration:480,fill:'forwards'});
-}
-document.querySelectorAll('#boxCat .menu-pill,#boxPromo .menu-pill,#boxCF .menu-pill').forEach(p=>{
-  p.addEventListener('click',()=>slideIn(p.dataset.cat||p.textContent.trim()));
-});
-
-/* PRO images (png/jpg any case) */
+/* Image loading helper */
 function loadFirstAvailable(holder, base){
   const exts=['.png','.PNG','.jpg','.JPG','.jpeg','.JPEG'];
   let i=0; const img=new Image();
@@ -462,7 +241,7 @@ document.querySelectorAll('[data-img]').forEach(el=>{
   const h=el.querySelector('.promo-holder'); if(h) loadFirstAvailable(h, el.dataset.img);
 });
 
-/* Modals open/close */
+/* Modal open/close */
 const joinModal=document.getElementById('joinModal');
 const joinDone =document.getElementById('joinDone');
 const loginModal=document.getElementById('loginModal');
@@ -473,20 +252,191 @@ const closeM=m=>{ m.style.display='none'; document.body.style.overflow=''; };
 /* buttons */
 document.getElementById('btnJoin').addEventListener('click',()=>openM(joinModal));
 document.getElementById('btnLogin').addEventListener('click',()=>openM(loginModal));
-document.getElementById('promo-big').addEventListener('click',()=>openM(joinModal)); /* big socket -> join */
+document.getElementById('promo-big').addEventListener('click',()=>openM(joinModal)); 
+document.getElementById('btnVip').addEventListener('click',()=>alert('VIP 호출 기능'));
 
 /* join flow */
-document.getElementById('joinSubmit').addEventListener('click',()=>{ closeM(joinModal); openM(joinDone); });
+document.getElementById('joinForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    // 실제 서버 전송 로직이 들어갈 자리
+    closeM(joinModal); 
+    openM(joinDone);
+});
 document.getElementById('joinClose').addEventListener('click',()=>closeM(joinModal));
 document.getElementById('doneClose').addEventListener('click',()=>closeM(joinDone));
 
-/* preference */
-document.getElementById('btnPref').addEventListener('click',()=>{ closeM(joinDone); openM(prefModal); });
-document.getElementById('prefClose').addEventListener('click',()=>closeM(prefModal));
-document.getElementById('prefSubmit').addEventListener('click',()=>{ closeM(prefModal); /* 쿠폰발급 로직 위치 */ });
-
 /* login */
 document.getElementById('loginClose').addEventListener('click',()=>closeM(loginModal));
+
+/* Bottom Nav links -> Placeholder */
+document.querySelectorAll('#bottomNav .nav-btn').forEach(el=>{
+    el.addEventListener('click',()=>alert(`[${el.textContent.trim()}] 페이지로 이동 - 콘텐츠 준비 중`));
+});
+
+
+/* ========================================================================= */
+/* Preference (동적 설문) 로직 - 9가지 항목 */
+/* ========================================================================= */
+
+const SV = [
+    {t:'hcasino2.com 에서 쿠폰을 받으실 아이디', kind:'input', name:'id', ph:'아이디를 입력해주세요'},
+    {t:'hcasino2.com에서 가입할 때 기입한 전화번호', kind:'input', name:'phone', ph:'전화번호를 입력해주세요'},
+    {t:'주로 하시는 게임을 선택해 주세요', kind:'radio', name:'game', opts:['카지노','슬롯','토토','전부']},
+    {t:'보통 일주일에 게임을 위하여 충전하시는 횟수는?', kind:'radio', name:'freq', opts:['1~2회','3~4회','5~6회','그 이상']},
+    {t:'최근 7일간 플레이한 횟수', kind:'radio', name:'recent', opts:['하루','이틀','사흘','그 이상']},
+    {t:'이용하는 곳을 고를 때 중요하다고 생각하는 것은?', kind:'radio', name:'point', opts:['롤링','보너스','업체명성','담당 파트너']},
+    {t:'플레이어의 1회 환급금으로 가장 그럴듯한 금액은?', kind:'radio', name:'refund', opts:['50만원','100만원','300만원','그 이상']},
+    {t:'혹시 오늘 충전하실 계획이 있으신가요?', kind:'radio', name:'today', opts:['오늘 합니다','조금 고민중입니다','쿠폰은 언제쯤?']},
+    {t:'형님 있잖습니까?\n첫충전 금액의 보너스 50%,\n슬롯 요율 3%,에\n담당 보너스 당일 충전횟수마다 +1만 보너스로\n준비해봤습니다.\n\n자리 한번 빛내주시겠습니까?', kind:'radio', name:'final', opts:['생각해볼께요','OK']}
+];
+let si = 0; // Current survey index
+let surveyData = {}; // To store answers
+
+function showSV(si){
+  const q = SV[si];
+  document.getElementById('qTitle').innerHTML = q.t.replace(/\n/g,'<br/>');
+  const field = document.getElementById('qField'); field.innerHTML = '';
+  
+  if(q.kind==='input'){
+    const inp=document.createElement('input'); inp.className='survey-field-input input'; inp.name=q.name; inp.placeholder=q.ph||''; inp.required=true;
+    inp.value = surveyData[q.name] || '';
+    field.appendChild(inp);
+  }else{
+    q.opts.forEach((txt,i)=>{
+      const lab=document.createElement('label'); lab.className='radio';
+      const r=document.createElement('input'); r.type='radio'; r.name=q.name; r.value=txt;
+      if(surveyData[q.name] === txt) r.checked = true;
+      lab.appendChild(r);
+      const sp=document.createElement('span'); sp.textContent=`${i+1}. ${txt}`;
+      lab.appendChild(sp);
+      field.appendChild(lab);
+    });
+  }
+  document.getElementById('svBack').style.visibility = (si===0)?'hidden':'visible';
+  document.getElementById('svNext').textContent = (si===SV.length-1)?'제출':'다음';
+}
+
+function svNext(){
+  const q = SV[si];
+  const field = document.getElementById('qField');
+  let value = null;
+
+  if(q.kind==='input'){
+    value=field.querySelector('input')?.value.trim();
+    if (!value) { alert(`${q.t.split('\n')[0]}을(를) 입력해주세요.`); return; }
+  }else{
+    value=field.querySelector('input[type="radio"]:checked')?.value;
+    if (!value) { alert(`${q.t.split('\n')[0]}를 선택해주세요.`); return; }
+  }
+
+  // Save answer
+  surveyData[q.name] = value;
+  
+  if (si < SV.length - 1) {
+    si++;
+    showSV(si);
+  } else {
+    // Final submission logic (여기에 설문 데이터를 GAS로 전송하는 로직이 추가됩니다. 현재는 placeholder)
+    console.log('Survey Submitted:', surveyData);
+    alert('오늘 이용하시는형님 저녁은 제가대접하겠습니다.고기는 속이.. 부대끼실테니..사발면..어떠십니까?');
+    closeM(prefModal);
+  }
+}
+
+// Button Listeners for Survey
+document.getElementById('btnPref').addEventListener('click',()=>{ closeM(joinDone); si=0; surveyData={}; showSV(si); openM(prefModal); });
+document.getElementById('svNext').addEventListener('click',svNext);
+document.getElementById('svBack').addEventListener('click',()=>{ 
+    if(si > 0) { si--; showSV(si); } 
+});
+document.getElementById('prefClose').addEventListener('click',()=>closeM(prefModal));
+
+
+/* ========================================================================= */
+/* 중복확인 기능 (모바일 버전) - GAS 로직 적용 */
+/* ========================================================================= */
+
+// 🚨 중요: 여기에 배포하신 구글 앱스 스크립트 웹 앱 URL을 붙여넣으세요!
+const GAS_URL = "YOUR_DEPLOYED_GOOGLE_APPS_SCRIPT_URL_HERE";
+
+// 🚨 중요: 중복 확인을 할 스프레드시트 ID와 시트 탭 이름을 설정하세요.
+const SHEET_ID = "YOUR_SPREADSHEET_ID_HERE";
+const SHEET_TAB = "시트1"; 
+
+// 구글 앱스 스크립트로 중복 확인 요청을 보내는 함수
+async function checkDuplicate(field, value) {
+    if (!GAS_URL.startsWith('https://script.google.com/macros/')) {
+        alert("🚨 오류: GAS_URL을 실제 배포 URL로 변경해야 합니다.");
+        return { success: false, message: "URL 미설정" };
+    }
+
+    try {
+        const response = await fetch(GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'check_dup', 
+                sheetId: SHEET_ID,
+                tab: SHEET_TAB,
+                field: field,
+                value: value
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP 오류: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.error("중복 확인 요청 오류:", error);
+        alert(`중복 확인 중 통신 오류가 발생했습니다: ${error.message}`);
+        return { success: false, message: "통신 실패" };
+    }
+}
+
+/* 중복확인 버튼 이벤트 리스너 */
+document.querySelectorAll('.btn-duplicate').forEach(button => {
+    button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        const inputGroup = button.closest('label').querySelector('.input-group');
+        const inputField = inputGroup ? inputGroup.querySelector('input') : null;
+        
+        if (!inputField) return;
+
+        const fieldName = inputField.getAttribute('name');
+        const fieldLabel = fieldName === 'user_id' ? '아이디' : '연락처';
+        const value = inputField.value.trim();
+        
+        if (value.length === 0) {
+            alert(`${fieldLabel}를 입력해주세요.`);
+            inputField.focus();
+            return;
+        }
+
+        const originalText = button.textContent;
+        button.textContent = '확인 중...';
+        button.disabled = true;
+
+        const result = await checkDuplicate(fieldName, value);
+
+        button.textContent = originalText;
+        button.disabled = false;
+
+        if (result.success) {
+            if (result.duplicate === true) {
+                alert(`[${fieldLabel}] '${value}'는 이미 사용 중입니다. 다른 값을 입력해주세요.`);
+            } else {
+                alert(`[${fieldLabel}] '${value}'는 사용 가능합니다.`);
+            }
+        } else {
+            alert(`[${fieldLabel}] 중복 확인 실패: ${result.message || '알 수 없는 오류'}`);
+        }
+    });
+});
 </script>
 </body>
 </html>
