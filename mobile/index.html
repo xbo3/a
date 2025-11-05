@@ -1,456 +1,492 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-<title>BiPa</title>
+<meta name="viewport" id="vp" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>EURO247</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+(function(){
+  const vp=document.getElementById('vp');
+  function applyDesktopScale(){
+    const w=window.screen.width, target=1280;
+    if(w<=820){
+      const s=w/target;
+      vp.setAttribute('content',`width=${target}, initial-scale=${s}, maximum-scale=${s}, minimum-scale=${s}, user-scalable=no, viewport-fit=cover`);
+      document.documentElement.classList.add('mobile-desktop');
+    }else{
+      vp.setAttribute('content','width=device-width, initial-scale=1, viewport-fit=cover');
+      document.documentElement.classList.remove('mobile-desktop');
+    }
+  }
+  applyDesktopScale();
+  addEventListener('resize',applyDesktopScale);
+})();
+</script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
-body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif;background:#0f1215;color:#eaf2ff}
-
-/* ===== Vars ===== */
+html,body{overflow-x:hidden}
 :root{
-  --gap:clamp(6px,2vw,12px);
-  --side:16px;
-  --slide:.9s cubic-bezier(.22,.61,.36,1);
-  --heroW:66.666%;
-  --H-header:56px; --H-member:64px; --H-sub:0px; --H-bottom:64px;
+  --sidebar-w:240px; --container:1480px;
+  --bg:#0f1215; --p1:#171a1f; --bd:#2a2f36; --text:#fff;
+  --hero-h:260px; --gap:10px; --overlay-dur:1.6s;
+  --promo-row:180px; --promo-mult:1;
 }
+*{box-sizing:border-box} body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',Inter,system-ui}
+.card{border:1px solid var(--bd);background:var(--p1);border-radius:14px}
 
-/* ===== Header & member ===== */
-header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;border-bottom:1px solid #232a34;padding:12px var(--side)}
-#logoSlot{display:flex;align-items:center;gap:10px;font-size:clamp(18px,4.5vw,24px);font-weight:900;color:#19b3ff}
-#logoSlot img{height:28px;display:block}
+/* Header */
+header{position:sticky;top:0;z-index:70;background:#13161B;border-bottom:1px solid var(--bd)}
+.header-inner{max-width:var(--container);margin:0 auto;display:flex;align-items:center;gap:12px;height:72px;padding:0 12px}
+.logo-box{width:var(--sidebar-w)}
+.logo-img{height:70px}
+.search{flex:1;display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border-radius:12px;background:#171a1f;border:1px solid var(--bd)}
 
-.member-bar{position:fixed;left:0;right:0;z-index:1100;display:grid;grid-template-columns:1fr 1fr 1fr;
-  gap:8px;padding:12px var(--side);background:#171a1f;border-bottom:1px solid #232a34;top:var(--H-header)}
-.member-bar button{padding:14px;border:none;border-radius:12px;font-weight:800;font-size:14px;color:#fff;cursor:pointer}
-.btn-join{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)}
-.btn-login{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%)}
-.btn-vip{background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%)}
-.btn-vip.glow{position:relative;box-shadow:0 0 10px rgba(255,255,255,.45),0 0 28px rgba(0,255,170,.35);border:2px solid rgba(0,255,170,.55);animation:vipPulse 2.4s ease-in-out infinite}
-@keyframes vipPulse{0%,100%{box-shadow:0 0 6px rgba(0,255,170,.2),0 0 18px rgba(0,255,170,.15)}50%{box-shadow:0 0 12px rgba(255,255,255,.6),0 0 36px rgba(0,255,170,.45)}}
+/* Layout */
+.layout{max-width:var(--container);margin:0 auto;display:flex;gap:16px;padding:0 12px}
+aside{width:var(--sidebar-w);flex-shrink:0}
+.sidebox{border:1px solid var(--bd);border-radius:12px;background:#12171c;overflow:hidden;margin-bottom:12px}
+.sidebox .head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;font-weight:900;background:linear-gradient(180deg,#151b21,#11161b);cursor:pointer}
+.sidebox .caret{color:#7f8e9c;transition:transform .45s}
+.sidebox.open .caret{transform:rotate(180deg)}
+.sidebox .body{height:0;overflow:hidden}
+.menu-list{padding:10px}
+.menu-pill{display:flex;align-items:center;height:40px;border:1px solid #2a2f36;border-radius:10px;padding:0 12px;margin-bottom:8px;background:linear-gradient(90deg,#141a20 0%,#141a20 60%,#1b2630 100%);opacity:0;transform:translateY(-6px);transition:opacity .35s,transform .35s,border-color .25s,box-shadow .25s}
+.menu-pill.show{opacity:1;transform:translateY(0)}
+.menu-pill:hover{border-color:#67e8f9aa;box-shadow:0 0 0 1px #67e8f955 inset,0 10px 20px rgba(0,0,0,.25)}
 
-/* ===== Main (flex + column-gap) ===== */
-.container{
-  position:fixed; left:0; right:0; overflow:hidden; display:flex;
-  top:calc(var(--H-header) + var(--H-member));
-  height:calc(100dvh - (var(--H-header) + var(--H-member) + var(--H-sub) + var(--H-bottom)));
-  column-gap:0; transition:column-gap var(--slide);
-  padding:0 var(--side); /* 좌우 여백 통일 */
-}
+/* Member buttons */
+.btn-row{display:flex;gap:8px;margin-bottom:8px}
+.btn-half{flex:1;height:40px;border-radius:10px;border:1px solid #2a2f36;background:linear-gradient(180deg,#1a2b45,#132237);font-weight:800}
+.btn-half.login{background:linear-gradient(180deg,#2b1733,#231327)}
+.btn-vip{width:100%;height:40px;border-radius:10px;border:1px solid #2a2f36;background:linear-gradient(180deg,#2d3a1c,#1e2812);font-weight:900}
 
-/* 좌/우 패딩 제거, 상/하만 */
-.content-area,.hero-area{ padding:12px 0; }
+/* Sections */
+.section{margin-top:18px}
 
-/* 왼쪽 컨텐츠 */
-.content-area{
-  flex:1 1 auto; transition:flex-basis var(--slide);
-  overflow:hidden;
-}
-.viewport-grid{
-  width:100%; height:100%; display:grid; gap:var(--gap); align-content:start;
-  grid-template-columns:1fr 1fr; grid-template-rows:8fr 4fr 4fr; /* BIG 8, SM 4, SM 4 */
-}
+/* Hero */
+#heroWrap{overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
+.hero-card{height:var(--hero-h);position:relative;overflow:hidden;background:linear-gradient(180deg,#1b2128,#14191e)}
+.name-line{display:flex;align-items:center;gap:8px}
+.tg-ico{display:inline-flex;width:18px;height:18px;opacity:.9}
+.tg-ico svg{width:18px;height:18px}
 
-/* BIGM (cover로 꽉 채움) */
-.bigm{grid-column:1/3;position:relative;border-radius:16px;overflow:hidden;background:#121821;color:#fff}
-.bigm .slides{position:absolute;inset:0}
-.bigm .slide{position:absolute;inset:0;background-position:center;background-repeat:no-repeat;background-size:cover;opacity:0;transition:opacity .8s ease}
-.bigm .slide.show{opacity:1}
-.bigm .overlay{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(10px,2.6vw,16px)}
-.bigm h2{font-size:clamp(14px,4.2vw,18px);font-weight:900;line-height:1.28}
-.bigm p{font-size:clamp(11px,3.5vw,13px);opacity:.95;margin-top:4px}
-.bigm.canJoin{cursor:pointer}
+/* 6-cards */
+.six-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--gap)}
+.six-grid .card{border-radius:16px;overflow:hidden}
 
-/* 스몰 4소켓 (cover로 꽉 채움) */
-.promo-card{position:relative;border-radius:14px;overflow:hidden;background:#222a33}
-.promo-card .img{position:absolute;inset:0;background-position:center;background-repeat:no-repeat;background-size:cover}
-.promo-card .cap{position:absolute;left:10px;bottom:10px;font-weight:800;font-size:clamp(11px,3.4vw,13px);text-shadow:0 2px 6px rgba(0,0,0,.8);color:#fff}
+/* Promo 1+4 */
+.exclusive{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--gap);grid-auto-rows:calc(var(--promo-row)*var(--promo-mult))}
+.excl-big{grid-column:span 6;grid-row:span 2}
+.excl-small{grid-column:span 3}
+.exclusive .card{position:relative;border-radius:14px;background:linear-gradient(180deg,#151b21,#11161b);box-shadow:0 0 0 1px rgba(120,160,200,.18) inset}
+.promo-card{padding:0;cursor:pointer;touch-action:manipulation}
+.promo-holder{position:absolute;inset:0;overflow:hidden;border-radius:14px}
+.promo-holder img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.95)}
+.promo-title{position:absolute;font-weight:800;font-size:16px;padding:10px 12px;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.promo-title.tl{top:8px;left:12px}.promo-title.tr{top:8px;right:12px;text-align:right}
+.promo-title.bl{bottom:8px;left:12px}.promo-title.br{bottom:8px;right:12px;text-align:right}
 
-/* 오른쪽 히어로 — 3등분 */
-.hero-area{
-  flex:0 0 0; max-width:0; transition:flex-basis var(--slide), max-width var(--slide);
-  display:grid; grid-template-rows:1fr 1fr 1fr; gap:var(--gap);
-  overflow:hidden; background:#0f1215; min-height:100%;
-}
-.hero-card{
-  border-radius:12px;overflow:hidden;background:#141820;border:1px solid #262b33;position:relative;text-decoration:none;color:#fff;
-  display:block;background-position:center;background-size:cover;opacity:0;transform:translateX(60px);transition:opacity .6s,transform .6s;
-  min-height:0; height:100%;
-}
-.hero-info{position:absolute;left:0;right:0;bottom:0;padding:10px;background:linear-gradient(to top,rgba(0,0,0,.9),transparent)}
-.hero-name{font-size:12px;color:#bbc7d8;margin-bottom:4px}
-.hero-title{font-size:14px;font-weight:800}
+/* Overlay (fixed page view) */
+.overlay{position:fixed;inset:0;z-index:9999;pointer-events:none}
+.overlay[hidden]{display:none}
+.overlay .scrim{position:absolute;inset:0;background:rgba(0,0,0,.45);opacity:0}
+.overlay .panel{position:absolute;width:0;height:0;background:#161a24;border:1px solid #2a2f36;border-radius:14px;transform-origin:0 0;box-shadow:0 18px 60px rgba(0,0,0,.35);overflow:hidden}
+.overlay.show{pointer-events:auto}
+.overlay .content{padding:16px}
+.overlay .close{position:absolute;right:12px;top:10px;padding:.35rem .6rem;border-radius:.5rem;background:#0ea5e9;color:#fff;font-weight:700}
 
-/* VIP 열림 상태 */
-.container.hero-active{ column-gap:var(--gap); }
-.container.hero-active .hero-area{ flex-basis:var(--heroW); max-width:var(--heroW); }
-.container.hero-active .content-area{ flex-basis:calc(100% - var(--heroW)); }
-.container.hero-active .hero-card:nth-child(1),
-.container.hero-active .hero-card:nth-child(2),
-.container.hero-active .hero-card:nth-child(3){opacity:1;transform:translateX(0)}
-.container.hero-active .hero-card:nth-child(2){transition-delay:.25s}
-.container.hero-active .hero-card:nth-child(3){transition-delay:.45s}
-
-/* ===== 하단 네비 & 하위분류 바 ===== */
-.bottom-nav{position:fixed;left:0;right:0;bottom:0;background:#13161b;border-top:1px solid #232a34;display:flex;justify-content:space-around;padding:8px 0 12px;z-index:300}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;flex:1;color:#8892a6;padding:4px}
-.nav-item.active{color:#19b3ff}
-.nav-icon{font-size:22px}
-.nav-label{font-size:11px;font-weight:600}
-
-.subbar{position:fixed;left:0;right:0;bottom:calc(var(--H-bottom));background:#0f141a;border-top:1px solid #263040;display:none;z-index:290;padding:8px var(--side)}
-.subbar.show{display:block}
-.subrow{display:flex;gap:8px;overflow:auto;scrollbar-width:none}
-.subrow::-webkit-scrollbar{display:none}
-.subchip{white-space:nowrap;padding:10px 12px;border-radius:999px;border:1px solid #2a3947;background:#121b24;color:#d7e7ff;font-weight:800;font-size:12px;cursor:pointer}
-.subchip.active{background:#0ea5e9;color:#002233;border-color:#35c1ff}
-
-/* ===== 모달(기본 숨김) - 수정된 부분 시작 ===== */
-.modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.55); backdrop-filter:blur(2px); z-index:5000; }
-.modal.show{ display:flex; }
-.modal-box{ width:min(420px,calc(100vw - 48px)); background:#12161b; border:1px solid #2a2f3a; border-radius:16px; padding:16px 16px 18px; color:#eaf2ff; }
-.form label{display:block; font-weight:800; color:#c9d5e5; margin-top:10px}
-
-/* 수정: input-group을 위한 flexbox 추가 */
-.input-group { 
-  display: flex; 
-  align-items: flex-end; /* 입력 필드와 버튼의 하단을 맞춤 */
-  gap: 8px; /* 입력 필드와 버튼 사이 간격 */
-  margin-top: 6px;
-}
-
-/* 수정: 모든 input 필드의 너비를 80%로 조정하고, 높이를 통일 */
-.input-group .input,
-.form .input { 
-  width: 80%; /* 100% -> 80% */
-  padding:12px 14px; 
-  border-radius:12px; 
-  border:1px solid #2a3340; 
-  background:#0f141a; 
-  color:#eaf2ff;
-  flex-grow: 1; /* 중복 확인 버튼이 있는 경우 남은 공간 차지 */
-}
-/* 중복 확인 버튼이 없는 일반 입력 필드 (예: 성함, 비밀번호) */
-.form label > .input {
-  width: 80%; /* 100% -> 80% */
-  display: block;
-  margin-top: 6px;
-}
-
-/* 수정: 중복 확인 버튼 스타일 */
-.btn-duplicate {
-  width: 20%; /* 남은 공간에 맞춤 */
-  padding: 12px 0px; /* 좌우 패딩 제거, 상하 패딩 유지 */
-  border-radius: 12px;
-  border: 1px solid #2a3340;
-  background: #1f2a3a; /* 조금 더 어두운 배경 */
-  color: #c9d5e5;
-  font-weight: 700;
-  font-size: 13px; /* 텍스트 크기 조정 */
-  cursor: pointer;
-  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
-  min-width: 70px; /* 버튼이 너무 줄어들지 않도록 최소 너비 설정 */
-}
-.btn-duplicate:hover {
-  background: #2a3340; /* 호버 시 색상 변경 */
-}
-/* ===== 모달(기본 숨김) - 수정된 부분 끝 ===== */
-
-.btn-primary{ width:100%; margin-top:14px; padding:12px 16px; border-radius:12px; border:0; background:#0ea5e9; color:#001018; font-weight:900; cursor:pointer }
-
-/* ===== 설문(연계페이지) 풀스크린 ===== */
-.survey{ position:fixed; inset:0; background:#0f1215; z-index:6000; display:none; flex-direction:column; }
-.survey.show{ display:flex; }
-.sv-head{ height:52px; display:flex; align-items:center; gap:8px; padding:0 14px; border-bottom:1px solid #1e2530; }
-.sv-title{ font-weight:900; font-size:15px; }
-.sv-step{ margin-left:auto; color:#9fb3c8; font-weight:800; font-size:13px; }
-.sv-body{ flex:1; overflow:auto; padding:16px; }
-.qbox{ background:#111722; border:1px solid #202838; border-radius:14px; padding:14px; }
-.qno{ color:#8da6c9; font-weight:900; margin-bottom:8px; }
-.qtitle{ color:#dbe7ff; font-weight:900; line-height:1.45; margin-bottom:10px; }
-.field{ display:flex; flex-direction:column; gap:10px; }
-.input2, .opt{ width:100%; padding:12px 12px; border-radius:12px; border:1px solid #273244; background:#0c131c; color:#eaf2ff; }
-.radio{ display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid #273244; background:#0c131c; border-radius:12px; }
-.radio input{ accent-color:#36b7ff; width:16px; height:16px; }
-.radio input{ accent-color:#36b7ff; width:16px; height:16px; }
-.sv-foot{ padding:10px 16px 18px; border-top:1px solid #1e2530; }
-.btn-next{ width:100%; padding:12px; border-radius:12px; border:0; background:#2d7dff; color:#fff; font-weight:900; font-size:15px; }
-.btn-next[disabled]{opacity:.4}
-.btn-back{ background:none; border:none; color:#8aa7c5; font-weight:800; margin-right:6px; }
-
-/* desktop */
-@media (min-width:960px){
-  :root{--heroW:60%}
-  .member-bar{grid-template-columns:180px 180px 180px;justify-content:center}
-}
+/* Modals */
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);z-index:10000}
+.modal .win{width:min(560px,92vw);background:#12161c;border:1px solid #2a2f36;border-radius:14px;padding:18px}
+.modal .hd{display:flex;align-items:center;justify-content:space-between}
+.modal .title{font-weight:800}
+.modal .close{color:#cbd5e1}
 </style>
+
+<script>
+(function(){
+  const url = new URL(location.href);
+  const f = url.searchParams.get('force');
+  if (f === 'desktop') localStorage.setItem('forceDesktop','1');
+  if (f === 'mobile')  localStorage.removeItem('forceDesktop');
+
+  const forced = localStorage.getItem('forceDesktop') === '1';
+  const inMobile = /\/mobile(\/|$)/i.test(location.pathname);
+  const mobileUA = /(Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini)/i.test(navigator.userAgent);
+  const small = Math.min(window.innerWidth, window.innerHeight) <= 768;
+
+  if (!inMobile && !forced && (f === 'mobile' || mobileUA || small)) {
+    location.replace('mobile/');
+  }
+})();
+</script>
+
 </head>
 <body>
+<header>
+  <div class="header-inner">
+    <div class="logo-box"><img class="logo-img" src="assets/bipa.png" alt="bipa"></div>
+   
+  </div>
+</header>
 
-<header><div id="logoSlot">BiPa</div></header>
-<div class="member-bar">
-  <button class="btn-join" onclick="openModal('joinModal')">가입</button>
-  <button class="btn-login" onclick="openModal('loginModal')">로그인</button>
-  <button id="vipBtn" class="btn-vip" onclick="toggleHero()">VIP 호출</button>
-</div>
+<div class="layout">
+  <aside>
+    <div class="sidebox open" id="memberBox">
+      <div class="head"><span>회원</span><span class="caret">⌄</span></div>
+      <div class="body"><div class="menu-list">
+        <div class="btn-row">
+          <button class="btn-half"  id="btnJoin">가입</button>
+          <button class="btn-half login" id="btnLogin">로그인</button>
+        </div>
+        <button class="btn-vip" id="btnVip">VIP 호출</button>
+      </div></div>
+    </div>
 
-<main id="container" class="container">
-  <section class="content-area">
-    <div class="viewport-grid">
-      <div class="bigm" id="bigm" title="이미지 1일 때 클릭하면 가입 팝업이 열립니다.">
-        <div class="slides"><div class="slide show" id="slideA"></div><div class="slide" id="slideB"></div></div>
-        <div class="overlay">
-          <div>
+    <!-- 1. 프로모션 -->
+    <div class="sidebox open" id="boxPromo">
+      <div class="head"><span>프로모션</span><span class="caret">⌄</span></div>
+      <div class="body"><div class="menu-list">
+        <div class="menu-pill" data-cat="공식,비공식프로모션">공식,비공식프로모션</div>
+        <div class="menu-pill" data-cat="신규즉시프로모션">신규즉시프로모션</div>
+        <div class="menu-pill" data-cat="시험범위공부하기">시험범위공부하기</div>
+        <div class="menu-pill" data-cat="퀴즈풀고쿠폰받기">퀴즈풀고쿠폰받기</div>
+      </div></div>
+    </div>
+
+    <!-- 2. 파트너서비스 -->
+    <div class="sidebox open" id="boxCat">
+      <div class="head"><span>파트너서비스</span><span class="caret">⌄</span></div>
+      <div class="body"><div class="menu-list">
+        <div class="menu-pill" data-cat="파트너서비스">🎫 파트너서비스</div>
+        <div class="menu-pill" data-cat="등급별 혜택">🧾 등급별 혜택</div>
+        <div class="menu-pill" data-cat="문의하기">🧩 문의하기</div>
+        <div class="menu-pill" data-cat="파트너인턴십 지원">🧩 파트너인턴십 지원</div>
+        <div class="menu-pill" data-cat="쿠폰신청하기">🧩 쿠폰신청하기</div>
+        <div class="menu-pill" data-cat="긴급쿠폰싱청" id="prefLine">⭐ 긴급쿠폰신청</div>
+      </div></div>
+    </div>
+
+    <!-- 3. 쿠폰 -->
+    <div class="sidebox open" id="boxCF">
+      <div class="head"><span>💸쿠폰💸</span><span class="caret">⌄</span></div>
+      <div class="body"><div class="menu-list">
+        <div class="menu-pill">쿠폰의 종류</div>
+        <div class="menu-pill">쿠폰신청하기</div>
+        <div class="menu-pill">긴급쿠폰신청하기</div>
+        <div class="menu-pill">인턴파트너영업쿠폰신청</div>
+      </div></div>
+    </div>
+  </aside>
+
+  <main class="flex-1 pb-16">
+    <div id="mainShift">
+      <!-- Hero (default collapsed) -->
+      <div id="heroWrap" style="height:0;overflow:hidden">
+        <div class="card p-3">
+          <div class="hero-grid">
+            <!-- Hero 1 -->
+            <div class="card hero-card">
+              <img src="assets/hero_left.jpg" alt="Jayme Sun" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px" onerror="this.style.display='none'">
+              <div class="absolute left-4 bottom-3">
+                <div class="text-xs text-neutral-300">Jayme Sun (제이미 선)</div>
+                <div class="name-line font-bold">Executive Host
+                  <span class="tg-ico" title="Telegram">
+                    <svg viewBox="0 0 24 24" fill="#29A9EA"><path d="M9.2 16.9 8.9 20c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.4.2 1.6-.8l2.9-13.7c.3-1.2-.4-1.7-1.2-1.4L2.7 9.7c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3L18.7 6c.6-.4 1.1-.2.7.2L9.2 16.9z"/></svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <!-- Hero 2 (Tom Woo) -->
+            <div class="card hero-card">
+              <img src="assets/hero_center.jpg" alt="Tom Woo" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px" onerror="this.style.display='none'">
+              <div class="absolute left-4 bottom-3">
+                <div class="text-xs text-neutral-300">Tom Woo (탐 우)</div>
+                <div class="name-line font-bold">Mid-level Host
+                  <a class="tg-ico" href="https://t.me/woo247" target="_blank" rel="noopener" title="Telegram">
+                    <svg viewBox="0 0 24 24" fill="#29A9EA"><path d="M9.2 16.9 8.9 20c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.4.2 1.6-.8l2.9-13.7c.3-1.2-.4-1.7-1.2-1.4L2.7 9.7c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3L18.7 6c.6-.4 1.1-.2.7.2L9.2 16.9z"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <!-- Hero 3 (Jay Hong) -->
+            <div class="card hero-card">
+              <img src="assets/hero_right.jpg" alt="Jay Hong" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:12px" onerror="this.style.display='none'">
+              <div class="absolute left-4 bottom-3">
+                <div class="text-xs text-neutral-300">Jay Hong (재 홍)</div>
+                <div class="name-line font-bold">Executive Host
+                  <a class="tg-ico" href="https://t.me/exid333" target="_blank" rel="noopener" title="Telegram">
+                    <svg viewBox="0 0 24 24" fill="#29A9EA"><path d="M9.2 16.9 8.9 20c.4 0 .6-.2.8-.4l2-1.9 4.1 3c.8.4 1.4.2 1.6-.8l2.9-13.7c.3-1.2-.4-1.7-1.2-1.4L2.7 9.7c-1.2.5-1.2 1.1-.2 1.4l4.2 1.3L18.7 6c.6-.4 1.1-.2.7.2L9.2 16.9z"/></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <a id="p1" class="promo-card" href="#"><span class="img"></span><span class="cap">프로모션 1</span></a>
-      <a id="p2" class="promo-card" href="#"><span class="img"></span><span class="cap">프로모션 2</span></a>
-      <a id="p3" class="promo-card" href="#"><span class="img"></span><span class="cap">프로모션 3</span></a>
-      <a id="p4" class="promo-card" href="#"><span class="img"></span><span class="cap">프로모션 4</span></a>
+
+      <!-- Promo group -->
+      <div id="promoGroup" class="section">
+        <div class="exclusive">
+          <!-- Big socket → 가입 팝업 -->
+          <button id="promo-big" class="card excl-big" data-img="PRO_BIG" style="position:relative;cursor:pointer">
+            <div class="promo-holder"></div>
+            <div class="p-5 text-left"><div class="text-lg font-bold">퀴즈만점!쿠폰만점!</div></div>
+          </button>
+          <!-- 4 sockets (transform pages) -->
+          <button class="card excl-small promo-card" data-go="#page-official" data-img="PRO1"><div class="promo-holder"></div><div class="promo-title tl">공식프로모션</div></button>
+          <button class="card excl-small promo-card" data-go="#page-partner"  data-img="PRO2"><div class="promo-holder"></div><div class="promo-title tr">파트너프로모션</div></button>
+          <button class="card excl-small promo-card" data-go="#page-now"      data-img="PRO3"><div class="promo-holder"></div><div class="promo-title bl">지금진행중</div></button>
+          <button class="card excl-small promo-card" data-go="#page-join"     data-img="PRO4"><div class="promo-holder"></div><div class="promo-title br">프로모션참여</div></button>
+        </div>
+      </div>
+
+      <!-- 6 cards -->
+      <div class="section" id="cards6">
+        <div class="six-grid">
+          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(0,70%,60%),hsl(60,50%,45%))"></div><div class="p-3"><div class="font-bold">30,000 슬롯전용쿠폰</div><div class="text-xs text-neutral-400 mt-1">사용 완료</div></div></div>
+          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(17,70%,60%),hsl(77,50%,45%))"></div><div class="p-3"><div class="font-bold">20,000 즉석쿠폰</div><div class="text-xs text-neutral-400 mt-1">3등급사용가능</div></div></div>
+          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(34,70%,60%),hsl(94,50%,45%))"></div><div class="p-3"><div class="font-bold">30,000 즉석쿠폰</div><div class="text-xs text-neutral-400 mt-1">사용 완료</div></div></div>
+          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(51,70%,60%),hsl(111,50%,45%))"></div><div class="p-3"><div class="font-bold">60,000 롤링쿠폰</div><div class="text-xs text-neutral-400 mt-1">3등급사용가능</div></div></div>
+          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(68,70%,60%),hsl(128,50%,45%))"></div><div class="p-3"><div class="font-bold">70,000 VIP쿠폰</div><div class="text-xs text-neutral-400 mt-1">사용 완료</div></div></div>
+          <div class="card"><div style="aspect-ratio:4/5;background:linear-gradient(180deg,hsl(85,70%,60%),hsl(145,50%,45%))"></div><div class="p-3"><div class="font-bold">100,000 VIP쿠폰</div><div class="text-xs text-neutral-400 mt-1">사용 완료</div></div></div>
+        </div>
+      </div>
     </div>
-  </section>
+  </main>
+</div>
 
-  <aside class="hero-area">
-    <a id="h1" class="hero-card" href="#"><div class="hero-info"><div class="hero-name">Jayme Sun (제이미 선)</div><div class="hero-title">Executive Host 🔷</div></div></a>
-    <a id="h2" class="hero-card" href="#"><div class="hero-info"><div class="hero-name">Tom Woo (탐 우)</div><div class="hero-title">Mid-level Host 📱</div></div></a>
-    <a id="h3" class="hero-card" href="#"><div class="hero-info"><div class="hero-name">Jay Hong (재 홍)</div><div class="hero-title">Executive Host 📱</div></div></a>
-  </aside>
-</main>
+<!-- Page templates -->
+<template id="pages">
+  <section id="page-official" class="content"><h2>공식프로모션</h2><p class="text-sm text-neutral-300">콘텐츠 준비중</p></section>
+  <section id="page-partner"  class="content"><h2>파트너프로모션</h2><p class="text-sm text-neutral-300">콘텐츠 준비중</p></section>
+  <section id="page-now"      class="content"><h2>지금진행중</h2><p class="text-sm text-neutral-300">콘텐츠 준비중</p></section>
+  <section id="page-join"     class="content"><h2>프로모션참여</h2><p class="text-sm text-neutral-300">콘텐츠 준비중</p></section>
+</template>
 
-<div id="subbar" class="subbar"><div id="subrow" class="subrow"></div></div>
-
-<nav class="bottom-nav" id="bnav">
-  <div class="nav-item" data-type="home"><div class="nav-icon">🏠</div><div class="nav-label">홈</div></div>
-  <div class="nav-item" data-type="promo"><div class="nav-icon">🎁</div><div class="nav-label">프로모션</div></div>
-  <div class="nav-item" data-type="partner"><div class="nav-icon">🎫</div><div class="nav-label">파트너</div></div>
-  <div class="nav-item" data-type="coupon"><div class="nav-icon">💸</div><div class="nav-label">쿠폰</div></div>
-</nav>
-
-<div id="joinModal" class="modal"><div class="modal-box">
-  <div class="modal-title">회원가입 <span style="margin-left:auto;cursor:pointer" onclick="closeModal('joinModal')">✕</span></div>
-  <form id="joinForm" class="form">
-    <label>아이디
-      <div class="input-group">
-        <input class="input" name="user_id" autocomplete="username" placeholder="아이디를 입력하세요" required/>
-        <button type="button" class="btn-duplicate">중복확인</button>
-      </div>
-    </label>
-  
-    <label>성함<input class="input" name="name" autocomplete="name" placeholder="성함을 입력하세요" required/></label>
-    
-    <label>비밀번호<input class="input" type="password" name="pw" autocomplete="new-password" placeholder="비밀번호를 입력하세요" required/></label>
-    
-    <label>비밀번호 확인<input class="input" type="password" name="pw_confirm" autocomplete="new-password" placeholder="비밀번호를 다시 입력하세요" required/></label>
-    
-    <label>연락처
-      <div class="input-group">
-        <input class="input" name="phone" autocomplete="tel" placeholder="연락처를 입력하세요" required/>
-        <button type="button" class="btn-duplicate">중복확인</button>
-      </div>
-    </label>
-    <button class="btn-primary" type="submit">회원가입</button>
-  </form>
-</div></div>
-
-<div id="completeModal" class="modal"><div class="modal-box" style="text-align:center">
-  <div class="modal-title" style="justify-content:center">🎉 가입 완료!
-    <span style="margin-left:auto;cursor:pointer" onclick="closeModal('completeModal')">✕</span></div>
-  <p style="color:#d7dee6;margin:10px 0 16px">쿠폰을 받으시려면 파트너 사이트 가입이 필요합니다</p>
-  <a href="https://HCASINO2.COM" target="_blank" rel="noopener" style="display:inline-block;font-weight:900;color:#43b0ff;text-decoration:none;margin:2px 0 8px">HCASINO2.COM</a>
-  <div style="color:#ffd166;font-weight:900;margin-bottom:18px">추천코드: MBC</div>
-  <button class="btn-primary" onclick="openSurvey()">가입 완료! 선호도 체크하기</button>
-</div></div>
-
-<div id="loginModal" class="modal"><div class="modal-box">
-  <div class="modal-title">로그인 <span style="margin-left:auto;cursor:pointer" onclick="closeModal('loginModal')">✕</span></div>
-  <div style="color:#aab6c8">로그인 페이지 준비 중입니다.</div>
-</div></div>
-
-<section id="survey" class="survey" aria-hidden="true">
-  <div class="sv-head">
-    <button class="btn-back" id="svBack" onclick="svPrev()" aria-label="이전">←</button>
-    <div class="sv-title">설문 질문</div>
-    <div class="sv-step" id="svStep">1 / 9</div>
+<!-- Overlay -->
+<div id="overlay" class="overlay" hidden>
+  <div class="scrim"></div>
+  <div class="panel">
+    <button id="btnClose" class="close">닫기</button>
+    <div id="overlayBody" class="content"></div>
   </div>
-  <div class="sv-body">
-    <div class="qbox">
-      <div class="qno" id="qNo">1.</div>
-      <div class="qtitle" id="qTitle">질문</div>
-      <div class="field" id="qField"></div>
+</div>
+
+<!-- Join -->
+<div id="joinModal" class="modal">
+  <div class="win">
+    <div class="hd"><div class="title">가입창</div><button id="joinClose" class="close">✕</button></div>
+    <div class="mt-3 grid gap-3">
+      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="아이디">
+      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="성함">
+      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="비밀번호" type="password">
+      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="연락처">
+      <button id="joinSubmit" class="px-4 py-3 rounded-md bg-[#0ea5e9] text-white">가입완료</button>
     </div>
   </div>
-  <div class="sv-foot">
-    <button id="svNext" class="btn-next" onclick="svNext()">다음</button>
+</div>
+
+<!-- Login -->
+<div id="loginModal" class="modal">
+  <div class="win">
+    <div class="hd"><div class="title">로그인</div><button id="loginClose" class="close">✕</button></div>
+    <div class="mt-3 grid gap-3">
+      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="아이디">
+      <input class="px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]" placeholder="비밀번호" type="password">
+      <button class="px-4 py-3 rounded-md bg-[#0ea5e9] text-white">로그인</button>
+    </div>
   </div>
-</section>
+</div>
+
+<!-- Join Done -->
+<div id="joinDone" class="modal">
+  <div class="win">
+    <div class="hd"><div class="title">가입 완료</div><button id="doneClose" class="close">✕</button></div>
+    <div class="mt-4 text-neutral-200 space-y-4">
+      <a href="https://www.HCASINO2.COM" class="text-2xl font-bold block text-center" target="_blank" rel="noopener">www.ev-62.com 에서</a>
+      <div class="text-center">가입완료하신분만! 1분선호도체크하고</div>
+      <div class="flex justify-center">
+        <button id="btnPref" class="px-8 py-4 rounded-md border border-yellow-400 text-yellow-200 text-xl">선호도 쿠폰받기</button>
+      </div>
+      <div class="text-xs text-neutral-400 text-center">*가입하신 후 선호도 쿠폰받기 순서로 하셔야 지급됩니다..</div>
+    </div>
+  </div>
+</div>
+
+<!-- Preference -->
+<div id="prefModal" class="modal">
+  <div class="win">
+    <div class="hd"><div class="title">1분 선호도 체크</div><button id="prefClose" class="close">✕</button></div>
+    <div class="mt-4 grid gap-4">
+      <label>선호 게임 장르
+        <select class="w-full mt-1 px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]">
+          <option>슬롯</option><option>라이브 카지노</option><option>스포츠</option><option>기타</option>
+        </select>
+      </label>
+      <label>플레이 빈도
+        <select class="w-full mt-1 px-3 py-2 rounded-md bg-[#0f1318] border border-[#2a2f36]">
+          <option>거의 매일</option><option>주 2~3회</option><option>가끔</option>
+        </select>
+      </label>
+      <button id="prefSubmit" class="px-4 py-3 rounded-md bg-[#0ea5e9] text-white">제출하고 쿠폰받기</button>
+    </div>
+  </div>
+</div>
 
 <script>
-/* 높이 보정 */
-function fitBars(){
-  const h=document.querySelector('header').offsetHeight;
-  const m=document.querySelector('.member-bar').offsetHeight;
-  const b=document.getElementById('bnav').offsetHeight;
-  const s=(document.getElementById('subbar').classList.contains('show')?document.getElementById('subbar').offsetHeight:0);
-  document.documentElement.style.setProperty('--H-header',h+'px');
-  document.documentElement.style.setProperty('--H-member',m+'px');
-  document.documentElement.style.setProperty('--H-bottom',b+'px');
-  document.documentElement.style.setProperty('--H-sub',s+'px');
-}
-addEventListener('load',fitBars); addEventListener('resize',fitBars);
-
-/* VIP 슬라이드 */
-function toggleHero(){
-  const c=document.getElementById('container'); const b=document.getElementById('vipBtn');
-  const open=!c.classList.contains('hero-active');
-  if(open){ c.classList.add('hero-active'); b.classList.add('glow'); }
-  else   { c.classList.remove('hero-active'); b.classList.remove('glow'); }
-}
-
-/* 하위분류 바 */
-const MAP={
-  home:{t:'홈',items:['메인','공지/안내']},
-  promo:{t:'프로모션',items:['첫입금/재충전','페이백/포인트','이벤트','VIP전용']},
-  partner:{t:'파트너',items:['VIP Host','Executive Host','쿠폰발급','문의']},
-  coupon:{t:'쿠폰',items:['선호도 체크*','퀴즈 쿠폰','내 쿠폰함']}
-};
-function populateSubbar(type){
-  const d=MAP[type]; const bar=document.getElementById('subbar'); const row=document.getElementById('subrow');
-  if(!d){ bar.classList.remove('show'); fitBars(); return; }
-  row.innerHTML='';
-  d.items.forEach(txt=>{
-    const chip=document.createElement('button'); chip.className='subchip'; chip.textContent=txt.replace('*','');
-    chip.onclick=()=>{
-      row.querySelectorAll('.subchip').forEach(c=>c.classList.remove('active'));
-      chip.classList.add('active');
-      if(txt.includes('선호도')) openSurvey();
-    };
-    row.appendChild(chip);
-  });
-  bar.classList.add('show'); fitBars();
-}
-document.querySelectorAll('.bottom-nav .nav-item').forEach(el=>{
-  el.addEventListener('click',()=>{
-    const type=el.dataset.type;
-    const isActive=el.classList.contains('active');
-    document.querySelectorAll('.bottom-nav .nav-item').forEach(n=>n.classList.remove('active'));
-    const bar=document.getElementById('subbar');
-    if(isActive){ bar.classList.remove('show'); fitBars(); return; }
-    el.classList.add('active'); populateSubbar(type);
+/* side accordion */
+document.querySelectorAll('.sidebox').forEach(box=>{
+  const head=box.querySelector('.head'), body=box.querySelector('.body');
+  const items=[...box.querySelectorAll('.menu-pill,.btn-half,.btn-vip')];
+  const autoH=()=>{ body.style.height='auto'; body.style.height=body.scrollHeight+'px'; };
+  if(box.classList.contains('open')){ autoH(); items.forEach((p,i)=>setTimeout(()=>p.classList.add('show'),i*80)); }
+  head.addEventListener('click',()=>{
+    const open=box.classList.contains('open');
+    if(open){
+      body.style.height=body.scrollHeight+'px';
+      requestAnimationFrame(()=>{ body.style.transition='height .7s cubic-bezier(.2,.8,.2,1)'; body.style.height='0px'; });
+      items.slice().reverse().forEach((p,i)=>setTimeout(()=>p.classList.remove('show'),i*50));
+      body.addEventListener('transitionend',function f(){ body.style.transition=''; box.classList.remove('open'); body.removeEventListener('transitionend',f); },{once:true});
+    }else{
+      box.classList.add('open'); body.style.height='0px';
+      requestAnimationFrame(()=>{ const h=body.scrollHeight+'px'; body.style.transition='height .7s cubic-bezier(.2,.8,.2,1)'; body.style.height=h; });
+      items.forEach((p,i)=>setTimeout(()=>p.classList.add('show'),i*110));
+      body.addEventListener('transitionend',function f(){ body.style.transition=''; body.style.height='auto'; body.removeEventListener('transitionend',f); },{once:true});
+    }
   });
 });
 
-/* 모달 */
-function openModal(id){document.getElementById(id).classList.add('show');}
-function closeModal(id){document.getElementById(id).classList.remove('show');}
-document.getElementById('joinForm').addEventListener('submit',e=>{e.preventDefault();closeModal('joinModal');openModal('completeModal');});
+/* hero height 40% of reference */
+const heroWrap=document.getElementById('heroWrap');
+function alignHero(){
+  const t=document.getElementById('prefLine'); if(!t) return;
+  const bottom=t.getBoundingClientRect().bottom+scrollY;
+  const top=heroWrap.getBoundingClientRect().top+scrollY;
+  const box=heroWrap.querySelector('.card.p-3'); const cs=getComputedStyle(box);
+  const pad=parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom);
+  const base=Math.max(160, Math.round(bottom-top-pad));
+  document.documentElement.style.setProperty('--hero-h', Math.round(base*0.4)+'px');
+}
+addEventListener('load',alignHero); addEventListener('resize',alignHero);
 
-/* 자산 로딩 (mobile → mobil 폴백) - 🚨 경로 수정 완료 🚨 */
-(function assets(){
-  // a 레포지토리 루트에서 'mobile/assets/' 폴더를 찾도록 경로 수정
-  const bases=['/a/mobile/assets/']; 
-  function ok(u){return new Promise(r=>{const i=new Image();i.onload=()=>r(true);i.onerror=()=>r(false);i.src=u+'?v=40r7';});}
-  (async ()=>{
-    let base=bases[0]; for(const b of bases){ if(await ok(b+'herom1.jpg')){ base=b; break; } }
-    // logo
-    const slot=document.getElementById('logoSlot'), logos=['logom.png','logom.jpg','logom.webp','logom.svg'];
-    for(const f of logos){ if(await ok(base+f)){ const img=new Image(); img.src=base+f+'?v=40r7'; img.alt='logo'; img.style.height='28px'; slot.innerHTML=''; slot.appendChild(img); break; } }
-    // BIGM 슬라이드
-    const imgs=[]; for(let i=1;i<=8;i++){const f=`bigm${i}.png`; if(await ok(base+f)) imgs.push(base+f+'?v=40r7');}
-    initBigm(imgs.length?imgs:[
-      'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22480%22><rect width=%22100%%22 height=%22100%%22 fill=%22%23161b22%22/></svg>'
-    ]);
-    // 스몰4
-    const setImg=(id,f)=>{const el=document.querySelector(`#${id} .img`); if(el) el.style.backgroundImage=`url('${base+f}?v=40r7')`;};
-    setImg('p1','prom1.png'); setImg('p2','prom2.png'); setImg('p3','prom3.png'); setImg('p4','prom4.png');
-    // 히어로
-    const H=(id,f)=>{const el=document.getElementById(id); if(el) el.style.backgroundImage=`url('${base+f}?v=40r7')`;};
-    H('h1','herom1.jpg'); H('h2','herom2.jpg'); H('h3','herom3.jpg');
-    fitBars();
-  })();
+/* hero toggle with VIP (default collapsed) */
+(function(){
+  const btn=document.getElementById('btnVip'); if(!btn) return;
+  let open=false;
+  function collapse(){ const h=heroWrap.scrollHeight; heroWrap.style.height=h+'px'; heroWrap.offsetHeight; heroWrap.style.transition='height .7s cubic-bezier(.2,.8,.2,1)'; heroWrap.style.height='0px'; heroWrap.addEventListener('transitionend',()=>{heroWrap.style.transition='';},{once:true}); }
+  function expand(){ heroWrap.style.height='0px'; heroWrap.offsetHeight; heroWrap.style.transition='height .7s cubic-bezier(.2,.8,.2,1)'; heroWrap.style.height=heroWrap.scrollHeight+'px'; heroWrap.addEventListener('transitionend',()=>{heroWrap.style.transition=''; heroWrap.style.height='auto';},{once:true}); }
+  btn.addEventListener('click',()=>{ open?collapse():expand(); open=!open; });
 })();
 
-/* BIGM 크로스페이드 + slide1 클릭시 가입 모달 */
-let tm=null, ix=0, bigmEl=null;
-function updateBigmClick(){ if(!bigmEl) return; if(ix===0){ bigmEl.classList.add('canJoin'); } else { bigmEl.classList.remove('canJoin'); } }
-function initBigm(imgs){
-  const a=document.getElementById('slideA'), b=document.getElementById('slideB');
-  bigmEl=document.getElementById('bigm');
-  a.style.backgroundImage=`url('${imgs[0]}')`; a.classList.add('show'); b.classList.remove('show');
-  ix=0; updateBigmClick();
-  bigmEl.onclick=()=>{ if(ix===0) openModal('joinModal'); };
-  if(imgs.length<=1) return;
-  if(tm) clearInterval(tm);
-  tm=setInterval(()=>{
-    const n=(ix+1)%imgs.length, showA=a.classList.contains('show'), front=showA?a:b, back=showA?b:a;
-    back.style.backgroundImage=`url('${imgs[n]}')`; back.classList.add('show'); front.classList.remove('show'); ix=n;
-    updateBigmClick();
-  }, 4000);
+/* fixed page rect = from main top to bottom of viewport (red box) */
+let FIXED_RECT=null;
+function computeFixedRect(){
+  const main=document.querySelector('main.flex-1').getBoundingClientRect();
+  const top=document.querySelector('#mainShift').getBoundingClientRect().top;
+  const height=Math.max(200, window.innerHeight - top - 16);  // fill to bottom
+  FIXED_RECT={left:main.left, top, width:main.width, height};
 }
+addEventListener('load',computeFixedRect); addEventListener('resize',computeFixedRect);
+function unifiedRect(){ if(!FIXED_RECT) computeFixedRect(); return FIXED_RECT; }
 
-/* ===== 설문 로직 ===== */
-const SV = [
-  {t:'hcasino2.com 에서 쿠폰을 받으실 아이디', kind:'input', name:'id', ph:'아이디를 입력해주세요'},
-  {t:'hcasino2.com에서 가입할 때 기입한 전화번호', kind:'input', name:'phone', ph:'전화번호를 입력해주세요'},
-  {t:'주로 하시는 게임을 선택해 주세요', kind:'radio', name:'game', opts:['카지노','슬롯','토토','전부']},
-  {t:'보통 일주일에 게임을 위하여 충전하시는 횟수는?', kind:'radio', name:'freq', opts:['1~2회','3~4회','5~6회','그 이상']},
-  {t:'최근 7일간 플레이한 횟수', kind:'radio', name:'recent', opts:['하루','이틀','사흘','그 이상']},
-  {t:'이용하는 곳을 고를 때 중요하다고 생각하는 것은?', kind:'radio', name:'point', opts:['롤링','보너스','업체명성','담당 파트너']},
-  {t:'플레이어의 1회 환급금으로 가장 그럴듯한 금액은?', kind:'radio', name:'refund', opts:['50만원','100만원','300만원','그 이상']},
-  {t:'혹시 오늘 충전하실 계획이 있으신가요?', kind:'radio', name:'today', opts:['오늘 합니다','조금 고민중입니다','쿠폰은 언제쯤?']},
-  {t:'형님 있잖습니까?\n첫충전 금액의 보너스 50%,\n슬롯 요율 3%,에\n담당 보너스 당일 충전횟수마다 +1만 보너스로\n준비해봤습니다.\n\n자리 한번 빛내주시겠습니까?', kind:'radio', name:'final', opts:['생각해볼께요','OK']}
-];
-let si = 0;
-function openSurvey(){
-  closeModal('completeModal');
-  const el=document.getElementById('survey'); el.classList.add('show'); document.body.style.overflow='hidden'; renderQ();
+/* overlay transform (precise) */
+const overlay=document.getElementById('overlay');
+const scrim=overlay.querySelector('.scrim');
+const panel=overlay.querySelector('.panel');
+const bodyEl=document.getElementById('overlayBody');
+const btnClose=document.getElementById('btnClose');
+const pages=document.getElementById('pages');
+const pageMap={}; pages.content.querySelectorAll('section').forEach(s=>pageMap['#'+s.id]=s);
+const DUR=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--overlay-dur'))||1.6;
+const opts={duration:DUR*1000,easing:'cubic-bezier(.2,0,.1,1)',fill:'forwards',composite:'replace'};
+function frameFromRect(from,to){
+  const sx=+(from.width/to.width).toFixed(4), sy=+(from.height/to.height).toFixed(4);
+  const tx=+(from.left-to.left).toFixed(2), ty=+(from.top-to.top).toFixed(2);
+  return `translate3d(${tx}px,${ty}px,0) scale(${sx},${sy})`;
 }
-function closeSurvey(){
-  document.getElementById('survey').classList.remove('show'); document.body.style.overflow='';
+let busy=false, openView=false, lastRect=null;
+function openFrom(el, sec){
+  if(busy||openView) return; busy=true;
+  bodyEl.innerHTML=''; bodyEl.appendChild(pageMap[sec].cloneNode(true));
+  const toR=unifiedRect(); const fromRect=el.getBoundingClientRect(); lastRect=fromRect;
+  panel.style.left=toR.left+'px'; panel.style.top=toR.top+'px'; panel.style.width=toR.width+'px'; panel.style.height=toR.height+'px';
+  const from=frameFromRect(fromRect,toR);
+  overlay.hidden=false; overlay.classList.add('show');
+  const pa=panel.animate([{opacity:0,transform:from},{opacity:1,transform:'translate3d(0,0,0) scale(1,1)'}],opts);
+  const sa=scrim.animate([{opacity:0},{opacity:1}],opts);
+  Promise.all([pa.finished,sa.finished]).then(()=>{busy=false;openView=true;});
 }
-function renderQ(){
-  const q=SV[si];
-  document.getElementById('svStep').textContent=`${si+1} / ${SV.length}`;
-  document.getElementById('qNo').textContent=`${si+1}.`;
-  document.getElementById('qTitle').innerHTML=q.t.replace(/\n/g,'<br/>');
-  const field=document.getElementById('qField'); field.innerHTML='';
-  if(q.kind==='input'){
-    const inp=document.createElement('input'); inp.className='input2'; inp.name=q.name; inp.placeholder=q.ph||''; inp.required=true;
-    field.appendChild(inp);
-  }else{
-    q.opts.forEach((txt,i)=>{
-      const lab=document.createElement('label'); lab.className='radio';
-      const r=document.createElement('input'); r.type='radio'; r.name=q.name; r.value=txt;
-      lab.appendChild(r);
-      const sp=document.createElement('span'); sp.textContent=`${i+1}. ${txt}`;
-      lab.appendChild(sp);
-      field.appendChild(lab);
-    });
-  }
-  document.getElementById('svBack').style.visibility = (si===0)?'hidden':'visible';
-  document.getElementById('svNext').textContent = (si===SV.length-1)?'제출':'다음';
+function closeOverlay(){
+  if(busy||!openView) return; busy=true;
+  const toR=unifiedRect(); const to=frameFromRect(lastRect,toR);
+  const pa=panel.animate([{opacity:1,transform:'translate3d(0,0,0) scale(1,1)'},{opacity:0,transform:to}],opts);
+  const sa=scrim.animate([{opacity:1},{opacity:0}],opts);
+  Promise.all([pa.finished,sa.finished]).then(()=>{overlay.hidden=true;overlay.classList.remove('show');busy=false;openView=false;});
 }
-function svNext(){
-  const q=SV[si]; const field=document.getElementById('qField');
-  let ok=false;
-  if(q.kind==='input'){
-    const v=field.querySelector('input')?.value.trim(); ok=!!v;
-  }else{
-    ok=!!field.querySelector('input[type="radio"]:checked');
-  }
-  if(!ok){ document.getElementById('svNext').disabled=true; setTimeout(()=>{document.getElementById('svNext').disabled=false;},400); return; }
-  if(si===SV.length-1){
-    // submit
-    closeSurvey();
-    alert('감사합니다! 응답이 제출되었습니다.');
-    return;
-  }
-  si++; renderQ();
+btnClose.addEventListener('click',closeOverlay); scrim.addEventListener('click',closeOverlay);
+
+/* promo sockets -> open transform */
+document.querySelectorAll('#promoGroup .promo-card').forEach(card=>{
+  card.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    openFrom(card, card.getAttribute('data-go'));
+  },{passive:false});
+});
+
+/* slide+fade for left submenus using same view box */
+function slideIn(title){
+  const fake=document.createElement('section'); fake.className='content';
+  fake.innerHTML=`<h2>${title}</h2><p class="text-sm text-neutral-300">콘텐츠 준비중</p>`;
+  bodyEl.innerHTML=''; bodyEl.appendChild(fake);
+  const toR=unifiedRect();
+  panel.style.left=toR.left+'px'; panel.style.top=toR.top+'px'; panel.style.width=toR.width+'px'; panel.style.height=toR.height+'px';
+  overlay.hidden=false; overlay.classList.add('show'); openView=true;
+  panel.animate([{opacity:0,transform:'translate3d(-30px,0,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],{duration:480,easing:'cubic-bezier(.2,.8,.2,1)',fill:'forwards'});
+  scrim.animate([{opacity:0},{opacity:1}],{duration:480,fill:'forwards'});
 }
-function svPrev(){ if(si>0){ si--; renderQ(); } }
+document.querySelectorAll('#boxCat .menu-pill,#boxPromo .menu-pill,#boxCF .menu-pill').forEach(p=>{
+  p.addEventListener('click',()=>slideIn(p.dataset.cat||p.textContent.trim()));
+});
+
+/* PRO images (png/jpg any case) */
+function loadFirstAvailable(holder, base){
+  const exts=['.png','.PNG','.jpg','.JPG','.jpeg','.JPEG'];
+  let i=0; const img=new Image();
+  img.onload=()=>{ img.className='w-full h-full object-cover'; holder.appendChild(img); };
+  img.onerror=()=>{ i++; if(i<exts.length) img.src=`assets/${base}${exts[i]}`; };
+  img.src=`assets/${base}${exts[i]}`;
+}
+document.querySelectorAll('[data-img]').forEach(el=>{
+  const h=el.querySelector('.promo-holder'); if(h) loadFirstAvailable(h, el.dataset.img);
+});
+
+/* Modals open/close */
+const joinModal=document.getElementById('joinModal');
+const joinDone =document.getElementById('joinDone');
+const loginModal=document.getElementById('loginModal');
+const prefModal=document.getElementById('prefModal');
+const openM=m=>{ m.style.display='flex'; document.body.style.overflow='hidden'; };
+const closeM=m=>{ m.style.display='none'; document.body.style.overflow=''; };
+
+/* buttons */
+document.getElementById('btnJoin').addEventListener('click',()=>openM(joinModal));
+document.getElementById('btnLogin').addEventListener('click',()=>openM(loginModal));
+document.getElementById('promo-big').addEventListener('click',()=>openM(joinModal)); /* big socket -> join */
+
+/* join flow */
+document.getElementById('joinSubmit').addEventListener('click',()=>{ closeM(joinModal); openM(joinDone); });
+document.getElementById('joinClose').addEventListener('click',()=>closeM(joinModal));
+document.getElementById('doneClose').addEventListener('click',()=>closeM(joinDone));
+
+/* preference */
+document.getElementById('btnPref').addEventListener('click',()=>{ closeM(joinDone); openM(prefModal); });
+document.getElementById('prefClose').addEventListener('click',()=>closeM(prefModal));
+document.getElementById('prefSubmit').addEventListener('click',()=>{ closeM(prefModal); /* 쿠폰발급 로직 위치 */ });
+
+/* login */
+document.getElementById('loginClose').addEventListener('click',()=>closeM(loginModal));
 </script>
 </body>
 </html>
