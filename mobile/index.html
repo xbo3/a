@@ -108,12 +108,57 @@ header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;borde
 .subchip{white-space:nowrap;padding:10px 12px;border-radius:999px;border:1px solid #2a3947;background:#121b24;color:#d7e7ff;font-weight:800;font-size:12px;cursor:pointer}
 .subchip.active{background:#0ea5e9;color:#002233;border-color:#35c1ff}
 
-/* ===== 모달(기본 숨김) ===== */
+/* ===== 모달(기본 숨김) - 수정된 부분 시작 ===== */
 .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.55); backdrop-filter:blur(2px); z-index:5000; }
 .modal.show{ display:flex; }
 .modal-box{ width:min(420px,calc(100vw - 48px)); background:#12161b; border:1px solid #2a2f3a; border-radius:16px; padding:16px 16px 18px; color:#eaf2ff; }
 .form label{display:block; font-weight:800; color:#c9d5e5; margin-top:10px}
-.input{ width:100%; margin-top:6px; padding:12px 14px; border-radius:12px; border:1px solid #2a3340; background:#0f141a; color:#eaf2ff }
+
+/* 수정: input-group을 위한 flexbox 추가 */
+.input-group { 
+  display: flex; 
+  align-items: flex-end; /* 입력 필드와 버튼의 하단을 맞춤 */
+  gap: 8px; /* 입력 필드와 버튼 사이 간격 */
+  margin-top: 6px;
+}
+
+/* 수정: 모든 input 필드의 너비를 80%로 조정하고, 높이를 통일 */
+.input-group .input,
+.form .input { 
+  width: 80%; /* 100% -> 80% */
+  padding:12px 14px; 
+  border-radius:12px; 
+  border:1px solid #2a3340; 
+  background:#0f141a; 
+  color:#eaf2ff;
+  flex-grow: 1; /* 중복 확인 버튼이 있는 경우 남은 공간 차지 */
+}
+/* 중복 확인 버튼이 없는 일반 입력 필드 (예: 성함, 비밀번호) */
+.form label > .input {
+  width: 80%; /* 100% -> 80% */
+  display: block;
+  margin-top: 6px;
+}
+
+/* 수정: 중복 확인 버튼 스타일 */
+.btn-duplicate {
+  width: 20%; /* 남은 공간에 맞춤 */
+  padding: 12px 0px; /* 좌우 패딩 제거, 상하 패딩 유지 */
+  border-radius: 12px;
+  border: 1px solid #2a3340;
+  background: #1f2a3a; /* 조금 더 어두운 배경 */
+  color: #c9d5e5;
+  font-weight: 700;
+  font-size: 13px; /* 텍스트 크기 조정 */
+  cursor: pointer;
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  min-width: 70px; /* 버튼이 너무 줄어들지 않도록 최소 너비 설정 */
+}
+.btn-duplicate:hover {
+  background: #2a3340; /* 호버 시 색상 변경 */
+}
+/* ===== 모달(기본 숨김) - 수정된 부분 끝 ===== */
+
 .btn-primary{ width:100%; margin-top:14px; padding:12px 16px; border-radius:12px; border:0; background:#0ea5e9; color:#001018; font-weight:900; cursor:pointer }
 
 /* ===== 설문(연계페이지) 풀스크린 ===== */
@@ -130,6 +175,7 @@ header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;borde
 .input2, .opt{ width:100%; padding:12px 12px; border-radius:12px; border:1px solid #273244; background:#0c131c; color:#eaf2ff; }
 .radio{ display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid #273244; background:#0c131c; border-radius:12px; }
 .radio input{ accent-color:#36b7ff; width:16px; height:16px; }
+.radio input{ accent-color:#36b7ff; width:16px; height:16px; }
 .sv-foot{ padding:10px 16px 18px; border-top:1px solid #1e2530; }
 .btn-next{ width:100%; padding:12px; border-radius:12px; border:0; background:#2d7dff; color:#fff; font-weight:900; font-size:15px; }
 .btn-next[disabled]{opacity:.4}
@@ -144,7 +190,7 @@ header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;borde
 </head>
 <body>
 
-<header><div id="logoSlot">EURO247</div></header>
+<header><div id="logoSlot">BiPa</div></header>
 <div class="member-bar">
   <button class="btn-join" onclick="openModal('joinModal')">가입</button>
   <button class="btn-login" onclick="openModal('loginModal')">로그인</button>
@@ -152,7 +198,6 @@ header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;borde
 </div>
 
 <main id="container" class="container">
-  <!-- 왼쪽 컨텐츠 -->
   <section class="content-area">
     <div class="viewport-grid">
       <div class="bigm" id="bigm" title="이미지 1일 때 클릭하면 가입 팝업이 열립니다.">
@@ -169,7 +214,6 @@ header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;borde
     </div>
   </section>
 
-  <!-- 오른쪽 히어로 -->
   <aside class="hero-area">
     <a id="h1" class="hero-card" href="#"><div class="hero-info"><div class="hero-name">Jayme Sun (제이미 선)</div><div class="hero-title">Executive Host 🔷</div></div></a>
     <a id="h2" class="hero-card" href="#"><div class="hero-info"><div class="hero-name">Tom Woo (탐 우)</div><div class="hero-title">Mid-level Host 📱</div></div></a>
@@ -177,10 +221,8 @@ header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;borde
   </aside>
 </main>
 
-<!-- 하위분류 바 -->
 <div id="subbar" class="subbar"><div id="subrow" class="subrow"></div></div>
 
-<!-- 하단 탭 -->
 <nav class="bottom-nav" id="bnav">
   <div class="nav-item" data-type="home"><div class="nav-icon">🏠</div><div class="nav-label">홈</div></div>
   <div class="nav-item" data-type="promo"><div class="nav-icon">🎁</div><div class="nav-label">프로모션</div></div>
@@ -188,18 +230,27 @@ header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;borde
   <div class="nav-item" data-type="coupon"><div class="nav-icon">💸</div><div class="nav-label">쿠폰</div></div>
 </nav>
 
-<!-- 가입/완료 -->
 <div id="joinModal" class="modal"><div class="modal-box">
   <div class="modal-title">회원가입 <span style="margin-left:auto;cursor:pointer" onclick="closeModal('joinModal')">✕</span></div>
   <form id="joinForm" class="form">
-    <label>아이디<input class="input" name="user_id" placeholder="아이디를 입력하세요" required/></label>
+    <label>아이디
+      <div class="input-group">
+        <input class="input" name="user_id" placeholder="아이디를 입력하세요" required/>
+        <button type="button" class="btn-duplicate">중복확인</button>
+      </div>
+    </label>
     <label>성함<input class="input" name="name" placeholder="성함을 입력하세요" required/></label>
     <label>비밀번호<input class="input" type="password" name="pw" placeholder="비밀번호를 입력하세요" required/></label>
-    <label>연락처<input class="input" name="phone" placeholder="연락처를 입력하세요" required/></label>
+    <label>비밀번호 확인<input class="input" type="password" name="pw_confirm" placeholder="비밀번호를 다시 입력하세요" required/></label>
+    <label>연락처
+      <div class="input-group">
+        <input class="input" name="phone" placeholder="연락처를 입력하세요" required/>
+        <button type="button" class="btn-duplicate">중복확인</button>
+      </div>
+    </label>
     <button class="btn-primary" type="submit">회원가입</button>
   </form>
 </div></div>
-
 <div id="completeModal" class="modal"><div class="modal-box" style="text-align:center">
   <div class="modal-title" style="justify-content:center">🎉 가입 완료!
     <span style="margin-left:auto;cursor:pointer" onclick="closeModal('completeModal')">✕</span></div>
@@ -214,7 +265,6 @@ header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;borde
   <div style="color:#aab6c8">로그인 페이지 준비 중입니다.</div>
 </div></div>
 
-<!-- ===== 설문(연계페이지) ===== -->
 <section id="survey" class="survey" aria-hidden="true">
   <div class="sv-head">
     <button class="btn-back" id="svBack" onclick="svPrev()" aria-label="이전">←</button>
@@ -293,9 +343,10 @@ function openModal(id){document.getElementById(id).classList.add('show');}
 function closeModal(id){document.getElementById(id).classList.remove('show');}
 document.getElementById('joinForm').addEventListener('submit',e=>{e.preventDefault();closeModal('joinModal');openModal('completeModal');});
 
-/* 자산 로딩 (mobile → mobil 폴백) */
+/* 자산 로딩 (mobile → mobil 폴백) - 수정된 경로 */
 (function assets(){
-  const bases=['/7/mobile/assets/','/7/mobil/assets/'];
+  // '7' 대신 'a'를 사용하고 선행 슬래시 '/'를 제거하여 GitHub Pages 서브 디렉토리에 맞게 수정
+  const bases=['a/mobile/assets/','a/mobil/assets/']; 
   function ok(u){return new Promise(r=>{const i=new Image();i.onload=()=>r(true);i.onerror=()=>r(false);i.src=u+'?v=40r7';});}
   (async ()=>{
     let base=bases[0]; for(const b of bases){ if(await ok(b+'herom1.jpg')){ base=b; break; } }
