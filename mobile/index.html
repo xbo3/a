@@ -251,6 +251,7 @@ header{position:fixed;left:0;right:0;top:0;z-index:1000;background:#13161b;borde
     <button class="btn-primary" type="submit">회원가입</button>
   </form>
 </div></div>
+
 <div id="completeModal" class="modal"><div class="modal-box" style="text-align:center">
   <div class="modal-title" style="justify-content:center">🎉 가입 완료!
     <span style="margin-left:auto;cursor:pointer" onclick="closeModal('completeModal')">✕</span></div>
@@ -343,10 +344,10 @@ function openModal(id){document.getElementById(id).classList.add('show');}
 function closeModal(id){document.getElementById(id).classList.remove('show');}
 document.getElementById('joinForm').addEventListener('submit',e=>{e.preventDefault();closeModal('joinModal');openModal('completeModal');});
 
-/* 자산 로딩 (mobile → mobil 폴백) - 수정된 경로 */
+/* 자산 로딩 (mobile → mobil 폴백) - 🚨 경로 수정 완료 🚨 */
 (function assets(){
-  // '7' 대신 'a'를 사용하고 선행 슬래시 '/'를 제거하여 GitHub Pages 서브 디렉토리에 맞게 수정
-  const bases=['a/mobile/assets/','a/mobil/assets/']; 
+  // a 레포지토리 루트에서 'mobile/assets/' 폴더를 찾도록 경로 수정
+  const bases=['mobile/assets/','mobil/assets/']; 
   function ok(u){return new Promise(r=>{const i=new Image();i.onload=()=>r(true);i.onerror=()=>r(false);i.src=u+'?v=40r7';});}
   (async ()=>{
     let base=bases[0]; for(const b of bases){ if(await ok(b+'herom1.jpg')){ base=b; break; } }
